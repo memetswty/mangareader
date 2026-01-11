@@ -10,7 +10,7 @@
 :root {
   --primary: #4ecdc4;
   --primary-dark: #2db4ac;
-  --primary-light: rgba(78, 205, 196, 0.15);
+  --primary-light: rgba(78, 205, 196, 0.1);
   --secondary: #ff6b6b;
   --dark-bg: #0f0f15;
   --darker-bg: #0a0a0f;
@@ -23,7 +23,6 @@
   --warning: #ffd93d;
   --border: rgba(255, 255, 255, 0.08);
   --shadow: rgba(0, 0, 0, 0.3);
-  --gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 
 * {
@@ -39,27 +38,11 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
-  position: relative;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(78, 205, 196, 0.05) 0%, transparent 20%),
-    radial-gradient(circle at 90% 80%, rgba(255, 107, 107, 0.05) 0%, transparent 20%),
-    radial-gradient(circle at 50% 50%, rgba(69, 183, 209, 0.03) 0%, transparent 30%);
-  z-index: -1;
-  pointer-events: none;
 }
 
 /* ===== HEADER ===== */
 header {
-  background: var(--gradient);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   padding: 20px 25px;
   text-align: center;
   position: sticky;
@@ -67,7 +50,7 @@ header {
   z-index: 100;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   animation: headerSlideDown 0.5s ease-out;
 }
 
@@ -87,23 +70,15 @@ header .logo i {
   color: var(--primary);
   font-size: 32px;
   animation: pulse 2s infinite;
-  text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
 }
 
 header .logo span {
   font-size: 28px;
   font-weight: 800;
-  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+  background: linear-gradient(90deg, var(--primary), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  background-size: 200% auto;
-  animation: textShine 3s ease-in-out infinite alternate;
-}
-
-@keyframes textShine {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
 }
 
 /* ===== SEARCH SECTION ===== */
@@ -113,8 +88,6 @@ header .logo span {
   position: relative;
   z-index: 90;
   animation: fadeIn 0.6s ease 0.2s both;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
 }
 
 .search-container {
@@ -129,7 +102,6 @@ header .logo span {
   align-items: center;
   margin-bottom: 15px;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .search-input-container {
@@ -149,12 +121,12 @@ header .logo span {
   font-size: 16px;
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px var(--shadow);
 }
 
 .search-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.25), 0 8px 25px rgba(78, 205, 196, 0.2);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.25);
   background: rgba(34, 34, 46, 1);
   transform: translateY(-2px);
 }
@@ -175,15 +147,8 @@ header .logo span {
 
 .search-input:focus + .search-icon {
   color: var(--primary);
-  animation: iconPulse 1s ease;
 }
 
-@keyframes iconPulse {
-  0%, 100% { transform: translateY(-50%) scale(1); }
-  50% { transform: translateY(-50%) scale(1.2); }
-}
-
-/* SEARCH ACTIONS - FIXED FOR MOBILE */
 .search-actions {
   display: flex;
   gap: 8px;
@@ -191,16 +156,12 @@ header .logo span {
   opacity: 0;
   transform: translateX(10px);
   transition: all 0.3s ease;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%) translateX(10px);
 }
 
 .search-input:focus ~ .search-actions,
 .search-actions.active {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translateX(0);
 }
 
 .search-btn, .clear-btn {
@@ -216,29 +177,12 @@ header .logo span {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   background: var(--primary);
   color: white;
-  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.search-btn::before, .clear-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.6s ease;
-}
-
-.search-btn:hover::before, .clear-btn:hover::before {
-  left: 100%;
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
 }
 
 .search-btn:hover, .clear-btn:hover {
   transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+  box-shadow: 0 6px 18px rgba(78, 205, 196, 0.4);
 }
 
 .search-btn:active, .clear-btn:active {
@@ -258,34 +202,6 @@ header .logo span {
   width: 48px;
 }
 
-/* MOBILE FIX FOR SEARCH ACTIONS */
-@media (max-width: 768px) {
-  .search-actions {
-    position: relative;
-    top: auto;
-    right: auto;
-    transform: none;
-    margin-top: 10px;
-    justify-content: flex-end;
-    width: 100%;
-    opacity: 1;
-  }
-  
-  .search-box {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .search-input-container {
-    width: 100%;
-  }
-  
-  .clear-btn.show {
-    width: 48px;
-    flex-shrink: 0;
-  }
-}
-
 /* ===== AUTO-SUGGEST ===== */
 .suggest-container {
   position: absolute;
@@ -301,7 +217,7 @@ header .logo span {
   border-radius: 14px;
   max-height: 320px;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -432,10 +348,9 @@ header .logo span {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--border);
 }
 
 .action-btn::before {
@@ -456,15 +371,13 @@ header .logo span {
 .action-btn:hover {
   background: rgba(42, 42, 58, 0.9);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: var(--primary-light);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .action-btn.active {
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+  box-shadow: 0 6px 18px rgba(78, 205, 196, 0.4);
   transform: translateY(-2px);
-  border-color: transparent;
 }
 
 .action-btn i {
@@ -479,10 +392,9 @@ header .logo span {
   margin: 0 auto 25px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
   animation: fadeInUp 0.5s ease 0.5s both;
-  backdrop-filter: blur(10px);
 }
 
 .nav-tab {
@@ -530,7 +442,6 @@ header .logo span {
   height: 3px;
   background: linear-gradient(90deg, var(--primary), var(--accent));
   animation: slideIn 0.4s ease-out;
-  box-shadow: 0 0 10px var(--primary);
 }
 
 .nav-tab i {
@@ -551,11 +462,11 @@ header .logo span {
   50% { transform: scale(1.2); }
 }
 
-/* ===== COMIC GRID WITH INFINITE SCROLL ===== */
+/* ===== COMIC GRID ===== */
 .comics-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 20px 40px;
   animation: fadeIn 0.6s ease;
 }
 
@@ -563,7 +474,6 @@ header .logo span {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 25px;
-  padding-bottom: 30px;
 }
 
 @media (max-width: 768px) {
@@ -588,7 +498,7 @@ header .logo span {
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -603,7 +513,7 @@ header .logo span {
 
 .comic-card:hover {
   transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   background: var(--card-hover);
   border-color: var(--primary-light);
 }
@@ -616,7 +526,6 @@ header .logo span {
   height: 260px;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(135deg, #2a2a3a, #1a1a2a);
 }
 
 .comic-image img {
@@ -624,43 +533,6 @@ header .logo span {
   height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
-}
-
-/* Cover Placeholder dengan gambar menarik */
-.comic-image .cover-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 24px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  position: relative;
-  overflow: hidden;
-}
-
-.comic-image .cover-placeholder::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 70%
-  );
-  animation: shine 3s infinite linear;
-}
-
-@keyframes shine {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
 .bookmark-btn {
@@ -681,13 +553,12 @@ header .logo span {
   transition: all 0.3s ease;
   z-index: 10;
   backdrop-filter: blur(5px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .bookmark-btn:hover {
   background: rgba(78, 205, 196, 0.9);
   transform: scale(1.15) rotate(10deg);
-  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
 }
 
 .bookmark-btn.bookmarked {
@@ -734,7 +605,6 @@ header .logo span {
   background: rgba(255, 255, 255, 0.05);
   padding: 5px 12px;
   border-radius: 20px;
-  border: 1px solid var(--border);
 }
 
 .highlight {
@@ -745,48 +615,55 @@ header .logo span {
   font-weight: 700;
 }
 
-/* ===== INFINITE SCROLL LOADING ===== */
-.infinite-scroll-loader {
-  grid-column: 1 / -1;
-  padding: 40px 20px;
-  text-align: center;
-  display: none;
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 30px 20px;
+  margin-top: 20px;
+  animation: fadeIn 0.6s ease;
 }
 
-.loader-spinner {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  border-top-color: var(--primary);
-  animation: spin 1s ease-in-out infinite;
+.pagination-btn {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(78, 205, 196, 0.9);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+  border-color: transparent;
 }
 
-.loader-text {
-  margin-top: 15px;
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.page-info {
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-light);
-  font-size: 14px;
-}
-
-/* ===== NO MORE CONTENT ===== */
-.no-more-content {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-light);
-  font-size: 16px;
-  display: none;
-}
-
-.no-more-content i {
-  font-size: 24px;
-  margin-bottom: 10px;
-  color: var(--primary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
 /* ===== DETAIL VIEW ===== */
@@ -812,7 +689,7 @@ header .logo span {
   align-items: center;
   gap: 8px;
   margin-bottom: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid var(--border);
 }
 
@@ -837,7 +714,6 @@ header .logo span {
 
 .detail-poster {
   flex-shrink: 0;
-  position: relative;
 }
 
 .detail-poster img {
@@ -845,13 +721,12 @@ header .logo span {
   height: 310px;
   border-radius: 16px;
   object-fit: cover;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
   transition: transform 0.5s ease;
-  border: 3px solid var(--primary);
 }
 
 .detail-poster:hover img {
-  transform: scale(1.03) rotate(1deg);
+  transform: scale(1.03);
 }
 
 .detail-content {
@@ -874,7 +749,6 @@ header .logo span {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .detail-meta {
@@ -899,7 +773,6 @@ header .logo span {
 .meta-item:hover {
   transform: translateY(-2px);
   border-color: var(--primary);
-  box-shadow: 0 5px 15px rgba(78, 205, 196, 0.2);
 }
 
 .meta-item i {
@@ -916,7 +789,6 @@ header .logo span {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   border-left: 3px solid var(--primary);
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 /* ===== CHAPTER LIST ===== */
@@ -936,7 +808,6 @@ header .logo span {
 
 .section-title i {
   color: var(--primary);
-  text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
 }
 
 .chapter-list {
@@ -1030,7 +901,6 @@ header .logo span {
   background: rgba(34, 34, 46, 0.8);
   border-radius: 12px;
   border: 1px solid var(--border);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .reader-controls {
@@ -1076,7 +946,7 @@ header .logo span {
 .nav-chapter-btn:hover:not(:disabled) {
   background: var(--primary);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+  box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
   border-color: transparent;
 }
 
@@ -1101,7 +971,7 @@ header .logo span {
   width: 100%;
   border-radius: 12px;
   margin-bottom: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   animation: fadeIn 0.8s ease;
   max-width: 100%;
   height: auto;
@@ -1130,7 +1000,7 @@ header .logo span {
   display: flex;
   align-items: center;
   gap: 18px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
 }
 
@@ -1275,7 +1145,7 @@ header .logo span {
   color: white;
   font-weight: 600;
   z-index: 1000;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   animation: slideInRight 0.3s ease, slideInRight 0.3s ease reverse 2.7s forwards;
   display: flex;
   align-items: center;
@@ -1291,38 +1161,6 @@ header .logo span {
 
 .notification.success {
   background: var(--success);
-}
-
-/* ===== FLOATING ACTION BUTTON ===== */
-.fab {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
-  transition: all 0.3s ease;
-  z-index: 90;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.fab:hover {
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 15px 40px rgba(78, 205, 196, 0.6);
 }
 
 /* ===== SCROLLBAR ===== */
@@ -1347,19 +1185,7 @@ header .logo span {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .search-box {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .search-actions {
-    position: relative;
-    top: auto;
-    right: auto;
-    transform: none;
-    margin-top: 10px;
-    justify-content: flex-end;
-    width: 100%;
-    opacity: 1;
+    gap: 8px;
   }
   
   .search-input {
@@ -1386,14 +1212,6 @@ header .logo span {
   .detail-title {
     font-size: 24px;
   }
-  
-  .fab {
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1407,6 +1225,13 @@ header .logo span {
   
   .search-section {
     padding: 15px;
+  }
+  
+  .search-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
   .nav-chapter-btn {
@@ -1431,10 +1256,6 @@ header .logo span {
   
   .detail-content {
     min-width: 100%;
-  }
-  
-  .comic-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
 }
 </style>
@@ -1512,16 +1333,16 @@ header .logo span {
   <section id="listView" class="comics-container">
     <div class="comics-grid" id="mangaList"></div>
     
-    <!-- Infinite Scroll Loader -->
-    <div id="infiniteScrollLoader" class="infinite-scroll-loader">
-      <div class="loader-spinner"></div>
-      <div class="loader-text">Memuat lebih banyak...</div>
-    </div>
-    
-    <!-- No More Content -->
-    <div id="noMoreContent" class="no-more-content">
-      <i class="fas fa-check-circle"></i>
-      <div>Sudah menampilkan semua komik</div>
+    <div class="pagination">
+      <button id="prevPage" class="pagination-btn">
+        <i class="fas fa-chevron-left"></i>
+        <span>Sebelumnya</span>
+      </button>
+      <div class="page-info" id="pageInfo">Halaman 1</div>
+      <button id="nextPage" class="pagination-btn">
+        <span>Berikutnya</span>
+        <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
   </section>
 
@@ -1593,11 +1414,6 @@ header .logo span {
   </section>
 </main>
 
-<!-- FLOATING ACTION BUTTON -->
-<button id="fab" class="fab" onclick="scrollToTop()">
-  <i class="fas fa-arrow-up"></i>
-</button>
-
 <script>
 const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
 
@@ -1608,9 +1424,7 @@ const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
 const clearBtn = document.getElementById("clearBtn");
 const searchActions = document.getElementById("searchActions");
-const infiniteScrollLoader = document.getElementById("infiniteScrollLoader");
-const noMoreContent = document.getElementById("noMoreContent");
-const fab = document.getElementById("fab");
+const pageInfo = document.getElementById("pageInfo");
 
 // State Management
 let mode = "all";
@@ -1618,25 +1432,9 @@ let searchQuery = "";
 let searchPage = 1;
 let totalPages = 1;
 let allDataCache = [];
-let displayedData = [];
 let bookmarks = JSON.parse(localStorage.getItem("komikBookmarks")) || [];
 let history = JSON.parse(localStorage.getItem("komikHistory")) || [];
 let currentView = "list";
-let isLoading = false;
-let hasMoreContent = true;
-let itemsPerPage = 24;
-let currentDisplayCount = 0;
-let scrollTimeout;
-
-// Placeholder images for comics without covers
-const placeholderImages = [
-  'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=400&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=600&fit=crop'
-];
 
 /* ===== UTILITIES ===== */
 function showNotification(message, type = "info") {
@@ -1740,12 +1538,7 @@ function toggleBookmark(manga) {
   }
   
   saveToLocalStorage();
-  renderList(displayedData);
-}
-
-// Get random placeholder image
-function getRandomPlaceholder() {
-  return placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+  renderList(allDataCache);
 }
 
 /* ===== VIEW MANAGEMENT ===== */
@@ -1792,133 +1585,18 @@ function setActiveView(view) {
   }
 }
 
-/* ===== INFINITE SCROLL ===== */
-function initInfiniteScroll() {
-  window.addEventListener('scroll', handleScroll);
-  window.addEventListener('touchmove', handleScroll);
-}
-
-function handleScroll() {
-  clearTimeout(scrollTimeout);
-  
-  scrollTimeout = setTimeout(() => {
-    if (isLoading || !hasMoreContent || currentView !== "list") return;
-    
-    const scrollPosition = window.innerHeight + window.scrollY;
-    const scrollThreshold = document.body.offsetHeight - 500;
-    
-    if (scrollPosition >= scrollThreshold) {
-      loadMoreContent();
-    }
-    
-    // Show/hide FAB
-    if (window.scrollY > 300) {
-      fab.style.display = 'flex';
-    } else {
-      fab.style.display = 'none';
-    }
-  }, 100);
-}
-
-async function loadMoreContent() {
-  if (isLoading || !hasMoreContent) return;
-  
-  isLoading = true;
-  infiniteScrollLoader.style.display = 'block';
-  
-  try {
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const nextItems = allDataCache.slice(currentDisplayCount, currentDisplayCount + itemsPerPage);
-    
-    if (nextItems.length === 0) {
-      hasMoreContent = false;
-      infiniteScrollLoader.style.display = 'none';
-      noMoreContent.style.display = 'block';
-      isLoading = false;
-      return;
-    }
-    
-    renderMoreItems(nextItems);
-    currentDisplayCount += nextItems.length;
-    
-    if (currentDisplayCount >= allDataCache.length) {
-      hasMoreContent = false;
-      infiniteScrollLoader.style.display = 'none';
-      noMoreContent.style.display = 'block';
-    }
-    
-  } catch (error) {
-    console.error("Error loading more content:", error);
-    showNotification("Gagal memuat lebih banyak konten", "error");
-  } finally {
-    isLoading = false;
-    infiniteScrollLoader.style.display = 'none';
-  }
-}
-
-function renderMoreItems(items) {
-  items.forEach((m, index) => {
-    const div = createComicCard(m, currentDisplayCount + index);
-    mangaList.appendChild(div);
-  });
-}
-
-function createComicCard(m, index) {
-  const div = document.createElement("div");
-  div.className = "comic-card";
-  const isBookmark = isBookmarked(m.slug);
-  div.style.setProperty("--delay", `${index * 0.05}s`);
-  
-  const coverImage = m.thumbnail && m.thumbnail !== "" 
-    ? m.thumbnail 
-    : getRandomPlaceholder();
-  
-  div.innerHTML = `
-    <div class="comic-image">
-      <img src="${coverImage}" 
-           alt="${m.title}" 
-           onerror="this.src='${getRandomPlaceholder()}'">
-      <button class="bookmark-btn ${isBookmark ? 'bookmarked' : ''}" 
-              onclick="event.stopPropagation(); toggleBookmark(${JSON.stringify(m).replace(/"/g, '&quot;')})">
-        <i class="fas fa-bookmark"></i>
-      </button>
-    </div>
-    <div class="comic-info">
-      <div class="comic-title">${highlight(m.title)}</div>
-      <div class="comic-meta">
-        <span class="comic-type">${m.type || 'Unknown'}</span>
-      </div>
-    </div>
-  `;
-  
-  div.onclick = () => loadDetail(m.slug);
-  return div;
-}
-
-function scrollToTop() {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-}
-
 /* ===== DATA LOADING ===== */
 async function loadAllManga() {
   mode = "all";
   setActiveTab("tabAll");
   showLoading();
-  resetInfiniteScroll();
   
   try {
     const res = await fetch(API);
     const json = await res.json();
     allDataCache = json.data || [];
-    displayedData = allDataCache.slice(0, itemsPerPage);
-    currentDisplayCount = displayedData.length;
-    renderList(displayedData);
-    hasMoreContent = currentDisplayCount < allDataCache.length;
+    renderList(allDataCache);
+    pageInfo.textContent = `Menampilkan ${allDataCache.length} komik`;
   } catch (error) {
     showEmptyState("Gagal Memuat Data", "Terjadi kesalahan saat memuat komik. Silakan coba lagi nanti.", "fas fa-exclamation-triangle");
     console.error("Error loading all manga:", error);
@@ -1929,16 +1607,13 @@ async function loadLatestManga() {
   mode = "latest";
   setActiveTab("tabLatest");
   showLoading();
-  resetInfiniteScroll();
   
   try {
     const res = await fetch(`${API}/latest`);
     const json = await res.json();
     allDataCache = json.data || [];
-    displayedData = allDataCache.slice(0, itemsPerPage);
-    currentDisplayCount = displayedData.length;
-    renderList(displayedData);
-    hasMoreContent = currentDisplayCount < allDataCache.length;
+    renderList(allDataCache);
+    pageInfo.textContent = `Menampilkan ${allDataCache.length} komik terbaru`;
   } catch (error) {
     showEmptyState("Gagal Memuat Data Terbaru", "Terjadi kesalahan saat memuat komik terbaru.", "fas fa-exclamation-triangle");
     console.error("Error loading latest manga:", error);
@@ -1952,31 +1627,23 @@ async function searchManga(page = 1) {
   mode = "search";
   searchPage = page;
   showLoading();
-  resetInfiniteScroll();
   
   try {
     const res = await fetch(`${API}/search?q=${encodeURIComponent(searchQuery)}&page=${page}`);
     const json = await res.json();
     
     allDataCache = json.data || [];
-    displayedData = allDataCache.slice(0, itemsPerPage);
-    currentDisplayCount = displayedData.length;
     totalPages = json.meta?.pagination?.total_pages || 1;
     
-    renderList(displayedData);
-    hasMoreContent = currentDisplayCount < allDataCache.length;
+    renderList(allDataCache);
+    pageInfo.textContent = `Halaman ${page} dari ${totalPages}`;
     
+    document.getElementById("prevPage").disabled = !(json.meta?.pagination?.previous_page);
+    document.getElementById("nextPage").disabled = !(json.meta?.pagination?.next_page);
   } catch (error) {
     showEmptyState("Pencarian Gagal", "Terjadi kesalahan saat melakukan pencarian. Silakan coba lagi.", "fas fa-search");
     console.error("Error searching manga:", error);
   }
-}
-
-function resetInfiniteScroll() {
-  currentDisplayCount = 0;
-  hasMoreContent = true;
-  infiniteScrollLoader.style.display = 'none';
-  noMoreContent.style.display = 'none';
 }
 
 function showEmptyState(title, description, icon) {
@@ -2005,14 +1672,32 @@ function renderList(data) {
   }
   
   data.forEach((m, index) => {
-    const div = createComicCard(m, index);
+    const div = document.createElement("div");
+    div.className = "comic-card";
+    const isBookmark = isBookmarked(m.slug);
+    div.style.setProperty("--delay", `${index * 0.05}s`);
+    
+    div.innerHTML = `
+      <div class="comic-image">
+        <img src="${m.thumbnail || 'https://via.placeholder.com/300x420/2a2a2a/fff?text=No+Image'}" 
+             alt="${m.title}" 
+             onerror="this.src='https://via.placeholder.com/300x420/2a2a2a/fff?text=No+Image'">
+        <button class="bookmark-btn ${isBookmark ? 'bookmarked' : ''}" 
+                onclick="event.stopPropagation(); toggleBookmark(${JSON.stringify(m).replace(/"/g, '&quot;')})">
+          <i class="fas fa-bookmark"></i>
+        </button>
+      </div>
+      <div class="comic-info">
+        <div class="comic-title">${highlight(m.title)}</div>
+        <div class="comic-meta">
+          <span class="comic-type">${m.type || 'Unknown'}</span>
+        </div>
+      </div>
+    `;
+    
+    div.onclick = () => loadDetail(m.slug);
     mangaList.appendChild(div);
   });
-  
-  // Show infinite scroll loader if there's more content
-  if (hasMoreContent && allDataCache.length > itemsPerPage) {
-    infiniteScrollLoader.style.display = 'block';
-  }
 }
 
 function showBookmarks() {
@@ -2020,16 +1705,12 @@ function showBookmarks() {
   document.getElementById("bookmarkBtn").classList.add("active");
   document.getElementById("historyBtn").classList.remove("active");
   setActiveTab("tabAll");
-  resetInfiniteScroll();
   
   if (bookmarks.length === 0) {
     showEmptyState("Belum Ada Bookmark", "Tambahkan komik ke bookmark dengan mengklik ikon bookmark pada kartu komik.", "fas fa-bookmark");
   } else {
-    allDataCache = bookmarks;
-    displayedData = bookmarks.slice(0, itemsPerPage);
-    currentDisplayCount = displayedData.length;
-    renderList(displayedData);
-    hasMoreContent = currentDisplayCount < bookmarks.length;
+    renderList(bookmarks);
+    pageInfo.textContent = `Menampilkan ${bookmarks.length} bookmark`;
   }
 }
 
@@ -2037,7 +1718,6 @@ function showHistory() {
   mode = "history";
   document.getElementById("historyBtn").classList.add("active");
   document.getElementById("bookmarkBtn").classList.remove("active");
-  resetInfiniteScroll();
   
   if (history.length === 0) {
     showEmptyState("Belum Ada Riwayat", "Riwayat baca Anda akan muncul di sini setelah Anda mulai membaca komik.", "fas fa-history");
@@ -2054,7 +1734,7 @@ function showHistory() {
       
       setTimeout(() => {
         div.innerHTML = `
-          <img src="${item.mangaThumb || getRandomPlaceholder()}" alt="${item.mangaTitle}">
+          <img src="${item.mangaThumb}" alt="${item.mangaTitle}">
           <div class="history-content">
             <div class="history-title">${item.mangaTitle}</div>
             <div class="history-chapter">${item.chapterTitle}</div>
@@ -2063,9 +1743,12 @@ function showHistory() {
           <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
         `;
         div.onclick = () => loadChapter(item.chapterSlug);
-        mangaList.appendChild(div);
       }, index * 50);
+      
+      mangaList.appendChild(div);
     });
+    
+    pageInfo.textContent = `Menampilkan ${history.length} riwayat`;
   }
 }
 
@@ -2080,7 +1763,7 @@ async function loadDetail(slug) {
     const d = json.data;
     
     document.getElementById("detailTitle").textContent = d.title || "Judul tidak tersedia";
-    document.getElementById("detailThumb").src = d.thumbnail || getRandomPlaceholder();
+    document.getElementById("detailThumb").src = d.thumbnail || "";
     document.getElementById("detailSynopsis").textContent = d.synopsis || "Sinopsis tidak tersedia";
     
     // Update meta info
@@ -2247,7 +1930,7 @@ searchInput.addEventListener("input", e => {
         const div = document.createElement("div");
         div.className = "suggest-item";
         div.innerHTML = `
-          <img src="${r.thumbnail || getRandomPlaceholder()}" 
+          <img src="${r.thumbnail || 'https://via.placeholder.com/50x70/2a2a2a/fff?text=No+Image'}" 
                alt="${r.title}">
           <div class="info">
             <div class="title">${highlight(r.title)}</div>
@@ -2301,11 +1984,10 @@ function applyFilter() {
     filtered = filtered.filter(m => m.type === type);
   }
   
-  resetInfiniteScroll();
-  displayedData = filtered.slice(0, itemsPerPage);
-  currentDisplayCount = displayedData.length;
-  renderList(displayedData);
-  hasMoreContent = currentDisplayCount < filtered.length;
+  renderList(filtered);
+  pageInfo.textContent = type ? 
+    `Menampilkan ${filtered.length} ${type}` : 
+    `Menampilkan ${filtered.length} komik`;
 }
 
 /* ===== NAVIGATION ===== */
@@ -2330,10 +2012,16 @@ function backToDetail() {
   setActiveView("detail");
 }
 
+// Event Listeners
+document.getElementById("prevPage").onclick = () => searchManga(searchPage - 1);
+document.getElementById("nextPage").onclick = () => searchManga(searchPage + 1);
+
+document.getElementById("tabAll").onclick = loadAllManga;
+document.getElementById("tabLatest").onclick = loadLatestManga;
+
 // Initialize
 window.onload = function() {
   loadAllManga();
-  initInfiniteScroll();
   
   // Add keyboard shortcuts
   document.addEventListener("keydown", (e) => {
@@ -2359,9 +2047,6 @@ window.onload = function() {
   if (history.length > 0) {
     console.log(`Loaded ${history.length} history items`);
   }
-  
-  // Hide FAB initially
-  fab.style.display = 'none';
 };
 </script>
 
