@@ -21,11 +21,15 @@ header {
   font-weight: bold;
 }
 
-/* === SEARCH BAR === */
+/* ===== SEARCH ===== */
+.search-wrap {
+  background: #181818;
+  padding: 10px;
+}
+
 .search-box {
   display: flex;
-  padding: 10px 15px;
-  background: #181818;
+  gap: 8px;
 }
 
 .search-box input {
@@ -34,23 +38,58 @@ header {
   border-radius: 25px;
   border: none;
   outline: none;
-  font-size: 14px;
   background: #2a2a2a;
   color: #fff;
 }
 
 .search-box button {
-  margin-left: 10px;
   border-radius: 50%;
   width: 42px;
   height: 42px;
   border: none;
-  background: #fff;
-  font-weight: bold;
   cursor: pointer;
 }
 
-/* === NAV TAB === */
+.clear-btn {
+  background: #444;
+  color: #fff;
+}
+
+/* autosuggest */
+.suggest {
+  background: #222;
+  border-radius: 8px;
+  margin-top: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggest div {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.suggest div:hover {
+  background: #333;
+}
+
+/* ===== FILTER ===== */
+.filter {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.filter select {
+  flex: 1;
+  padding: 8px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+/* ===== NAV ===== */
 .nav {
   display: flex;
   background: #181818;
@@ -72,7 +111,7 @@ header {
   border-bottom: 2px solid #fff;
 }
 
-/* === LIST === */
+/* ===== LIST ===== */
 .container {
   padding: 15px;
   display: grid;
@@ -102,12 +141,19 @@ header {
   font-weight: bold;
 }
 
-.info {
-  font-size: 12px;
-  color: #ccc;
+mark {
+  background: #ffd54f;
+  color: #000;
 }
 
-/* === DETAIL & READER === */
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+}
+
+/* ===== DETAIL & READER ===== */
 .detail, .reader {
   display: none;
   padding: 15px;
@@ -156,9 +202,23 @@ button:disabled {
 <header>📚 Komik Reader</header>
 
 <!-- SEARCH -->
-<div class="search-box">
-  <input id="searchInput" placeholder="Cari judul komik...">
-  <button onclick="searchManga()">🔍</button>
+<div class="search-wrap">
+  <div class="search-box">
+    <input id="searchInput" placeholder="Cari judul komik...">
+    <button onclick="searchManga()">🔍</button>
+    <button class="clear-btn" onclick="clearSearch()">❌</button>
+  </div>
+
+  <div id="suggestBox" class="suggest" style="display:none"></div>
+
+  <div class="filter">
+    <select id="typeFilter" onchange="applyFilter()">
+      <option value="">Semua Type</option>
+      <option value="Manga">Manga</option>
+      <option value="Manhwa">Manhwa</option>
+      <option value="Manhua">Manhua</option>
+    </select>
+  </div>
 </div>
 
 <!-- NAV -->
@@ -170,6 +230,11 @@ button:disabled {
 <!-- LIST -->
 <div id="listView">
   <div class="container" id="mangaList"></div>
+
+  <div class="pagination">
+    <button id="prevPage">⬅ Prev</button>
+    <button id="nextPage">Next ➡</button>
+  </div>
 </div>
 
 <!-- DETAIL -->
@@ -196,53 +261,100 @@ button:disabled {
 <script>
 const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
 const mangaList = document.getElementById("mangaList");
-
-const listView = document.getElementById("listView");
-const detailView = document.getElementById("detailView");
-const readerView = document.getElementById("readerView");
-
-const tabAll = document.getElementById("tabAll");
-const tabLatest = document.getElementById("tabLatest");
+const suggestBox = document.getElementById("suggestBox");
 
 let mode = "all";
+let searchQuery = "";
+let searchPage = 1;
+let allDataCache = [];
 
-/* ===== ALL ===== */
-async function loadAllManga() {
-  mode = "all";
-  setActiveTab(tabAll);
-  const res = await fetch(API);
-  const json = await res.json();
-  renderList(json.data);
+/* ===== UTIL ===== */
+function highlight(text) {
+  if (!searchQuery) return text;
+  return text.replace(
+    new RegExp(`(${searchQuery})`, "gi"),
+    "<mark>$1</mark>"
+  );
 }
 
-/* ===== LATEST ===== */
+/* ===== LOAD ALL ===== */
+async function loadAllManga() {
+  mode = "all";
+  const res = await fetch(API);
+  const json = await res.json();
+  allDataCache = json.data;
+  renderList(allDataCache);
+}
+
+/* ===== LOAD LATEST ===== */
 async function loadLatestManga() {
   mode = "latest";
-  setActiveTab(tabLatest);
   const res = await fetch(`${API}/latest`);
   const json = await res.json();
-  renderList(json.data);
+  allDataCache = json.data;
+  renderList(allDataCache);
 }
 
 /* ===== SEARCH ===== */
-async function searchManga() {
-  const q = document.getElementById("searchInput").value.trim();
-  if (!q) return;
+async function searchManga(page = 1) {
+  searchQuery = document.getElementById("searchInput").value.trim();
+  if (!searchQuery) return;
 
   mode = "search";
-  tabAll.classList.remove("active");
-  tabLatest.classList.remove("active");
+  searchPage = page;
 
-  const res = await fetch(`${API}/search?q=${encodeURIComponent(q)}`);
+  const res = await fetch(`${API}/search?q=${encodeURIComponent(searchQuery)}&page=${page}`);
   const json = await res.json();
-  renderList(json.data);
+
+  allDataCache = json.data;
+  renderList(allDataCache);
+
+  document.getElementById("prevPage").disabled = !json.meta.pagination.previous_page;
+  document.getElementById("nextPage").disabled = !json.meta.pagination.next_page;
+}
+
+/* ===== AUTOSUGGEST ===== */
+let debounce;
+document.getElementById("searchInput").addEventListener("input", e => {
+  clearTimeout(debounce);
+  debounce = setTimeout(() => {
+    const val = e.target.value.trim();
+    if (!val) {
+      suggestBox.style.display = "none";
+      return;
+    }
+    const result = allDataCache
+      .filter(m => m.title.toLowerCase().includes(val.toLowerCase()))
+      .slice(0, 5);
+
+    suggestBox.innerHTML = "";
+    result.forEach(r => {
+      const d = document.createElement("div");
+      d.textContent = r.title;
+      d.onclick = () => {
+        document.getElementById("searchInput").value = r.title;
+        suggestBox.style.display = "none";
+        searchManga();
+      };
+      suggestBox.appendChild(d);
+    });
+    suggestBox.style.display = result.length ? "block" : "none";
+  }, 300);
+});
+
+/* ===== FILTER ===== */
+function applyFilter() {
+  const type = document.getElementById("typeFilter").value;
+  let filtered = allDataCache;
+  if (type) filtered = filtered.filter(m => m.type === type);
+  renderList(filtered);
 }
 
 /* ===== RENDER ===== */
 function renderList(data) {
   mangaList.innerHTML = "";
   if (data.length === 0) {
-    mangaList.innerHTML = "<p>❌ Komik tidak ditemukan</p>";
+    mangaList.innerHTML = "<p>❌ Tidak ditemukan</p>";
     return;
   }
 
@@ -252,8 +364,7 @@ function renderList(data) {
     div.innerHTML = `
       <img src="${m.thumbnail}">
       <div class="card-body">
-        <div class="title">${m.title}</div>
-        <div class="info">${m.latest_chapter?.title || ""}</div>
+        <div class="title">${highlight(m.title)}</div>
       </div>
     `;
     div.onclick = () => loadDetail(m.slug);
@@ -261,27 +372,33 @@ function renderList(data) {
   });
 }
 
+/* ===== CLEAR ===== */
+function clearSearch() {
+  document.getElementById("searchInput").value = "";
+  suggestBox.style.display = "none";
+  loadAllManga();
+}
+
 /* ===== DETAIL ===== */
 async function loadDetail(slug) {
-  listView.style.display = "none";
-  detailView.style.display = "block";
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").style.display = "block";
 
   const res = await fetch(`${API}/detail/${slug}`);
   const json = await res.json();
   const d = json.data;
 
-  document.getElementById("detailTitle").textContent = d.title;
-  document.getElementById("detailThumb").src = d.thumbnail;
-  document.getElementById("detailSynopsis").textContent = d.synopsis;
+  detailTitle.textContent = d.title;
+  detailThumb.src = d.thumbnail;
+  detailSynopsis.textContent = d.synopsis;
 
-  const cl = document.getElementById("chapterList");
-  cl.innerHTML = "";
+  chapterList.innerHTML = "";
   d.chapters.forEach(c => {
     const div = document.createElement("div");
     div.className = "chapter";
     div.textContent = c.title;
     div.onclick = () => loadChapter(c.slug);
-    cl.appendChild(div);
+    chapterList.appendChild(div);
   });
 }
 
@@ -294,33 +411,24 @@ async function loadChapter(slug) {
   const json = await res.json();
   const d = json.data;
 
-  document.getElementById("chapterTitle").textContent = d.title;
+  chapterTitle.textContent = d.title;
+  imageContainer.innerHTML = "";
 
-  const box = document.getElementById("imageContainer");
-  box.innerHTML = "";
-  d.images.forEach(imgUrl => {
+  d.images.forEach(i => {
     const img = document.createElement("img");
-    img.src = imgUrl;
+    img.src = i;
     img.loading = "lazy";
-    box.appendChild(img);
+    imageContainer.appendChild(img);
   });
 
-  document.getElementById("prevChapter").disabled = !d.previous_chapter_slug;
-  document.getElementById("nextChapter").disabled = !d.next_chapter_slug;
+  prevChapter.disabled = !d.previous_chapter_slug;
+  nextChapter.disabled = !d.next_chapter_slug;
 
-  document.getElementById("prevChapter").onclick =
-    () => loadChapter(d.previous_chapter_slug);
-  document.getElementById("nextChapter").onclick =
-    () => loadChapter(d.next_chapter_slug);
+  prevChapter.onclick = () => loadChapter(d.previous_chapter_slug);
+  nextChapter.onclick = () => loadChapter(d.next_chapter_slug);
 }
 
 /* ===== NAV ===== */
-function setActiveTab(tab) {
-  tabAll.classList.remove("active");
-  tabLatest.classList.remove("active");
-  tab.classList.add("active");
-}
-
 function backToList() {
   detailView.style.display = "none";
   readerView.style.display = "none";
@@ -332,12 +440,11 @@ function backToDetail() {
   detailView.style.display = "block";
 }
 
+document.getElementById("prevPage").onclick = () => searchManga(searchPage - 1);
+document.getElementById("nextPage").onclick = () => searchManga(searchPage + 1);
+
 tabAll.onclick = loadAllManga;
 tabLatest.onclick = loadLatestManga;
-
-document.getElementById("searchInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") searchManga();
-});
 
 loadAllManga();
 </script>
