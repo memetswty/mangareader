@@ -21,6 +21,7 @@
       font-weight: bold;
     }
 
+    /* ===== LIST ===== */
     .container {
       padding: 15px;
       display: grid;
@@ -53,12 +54,12 @@
     .title {
       font-size: 14px;
       font-weight: bold;
-      margin-bottom: 5px;
     }
 
     .info {
       font-size: 12px;
       color: #ccc;
+      margin-top: 3px;
     }
 
     .pagination {
@@ -80,23 +81,105 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    /* ===== DETAIL ===== */
+    .detail {
+      padding: 15px;
+      display: none;
+    }
+
+    .detail-header {
+      display: flex;
+      gap: 15px;
+    }
+
+    .detail-header img {
+      width: 160px;
+      border-radius: 8px;
+    }
+
+    .detail-info h2 {
+      margin: 0 0 5px;
+    }
+
+    .genres span {
+      background: #333;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+
+    .synopsis {
+      margin-top: 15px;
+      line-height: 1.5;
+      color: #ddd;
+    }
+
+    .chapter-list {
+      margin-top: 20px;
+    }
+
+    .chapter {
+      padding: 10px;
+      background: #1c1c1c;
+      margin-bottom: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .chapter:hover {
+      background: #2a2a2a;
+    }
+
+    .back-btn {
+      margin-bottom: 15px;
+      background: #444;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
 <header>📚 Komik Reader</header>
 
-<div class="container" id="mangaList"></div>
+<!-- LIST MANGA -->
+<div id="listView">
+  <div class="container" id="mangaList"></div>
 
-<div class="pagination">
-  <button id="prevBtn">⬅ Prev</button>
-  <span id="pageInfo"></span>
-  <button id="nextBtn">Next ➡</button>
+  <div class="pagination">
+    <button id="prevBtn">⬅ Prev</button>
+    <span id="pageInfo"></span>
+    <button id="nextBtn">Next ➡</button>
+  </div>
+</div>
+
+<!-- DETAIL MANGA -->
+<div class="detail" id="detailView">
+  <button class="back-btn" onclick="showList()">⬅ Kembali</button>
+
+  <div class="detail-header">
+    <img id="detailThumb">
+    <div class="detail-info">
+      <h2 id="detailTitle"></h2>
+      <div id="detailMeta"></div>
+      <div class="genres" id="detailGenres"></div>
+    </div>
+  </div>
+
+  <div class="synopsis" id="detailSynopsis"></div>
+
+  <div class="chapter-list" id="chapterList">
+    <h3>📖 Daftar Chapter</h3>
+  </div>
 </div>
 
 <script>
-  const API_BASE = "https://unofficial-komikcast-api.vercel.app/komikcast";
+  const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
   let currentPage = 1;
+
+  const listView = document.getElementById("listView");
+  const detailView = document.getElementById("detailView");
 
   const mangaList = document.getElementById("mangaList");
   const prevBtn = document.getElementById("prevBtn");
@@ -105,47 +188,70 @@
 
   async function loadManga(page = 1) {
     mangaList.innerHTML = "Loading...";
-    
-    try {
-      const res = await fetch(`${API_BASE}/${page}`);
-      const json = await res.json();
+    const res = await fetch(`${API}/${page}`);
+    const json = await res.json();
 
-      mangaList.innerHTML = "";
+    mangaList.innerHTML = "";
 
-      json.data.forEach(manga => {
-        const card = document.createElement("div");
-        card.className = "card";
+    json.data.forEach(manga => {
+      const card = document.createElement("div");
+      card.className = "card";
 
-        card.innerHTML = `
-          <img src="${manga.thumbnail}" alt="${manga.title}">
-          <div class="card-body">
-            <div class="title">${manga.title}</div>
-            <div class="info">⭐ ${manga.rating || "-"}</div>
-            <div class="info">${manga.latest_chapter?.title || "-"}</div>
-          </div>
-        `;
+      card.innerHTML = `
+        <img src="${manga.thumbnail}">
+        <div class="card-body">
+          <div class="title">${manga.title}</div>
+          <div class="info">⭐ ${manga.rating || "-"}</div>
+          <div class="info">${manga.latest_chapter?.title || "-"}</div>
+        </div>
+      `;
 
-        card.onclick = () => {
-          alert(
-            "Judul: " + manga.title +
-            "\nSlug: " + manga.slug +
-            "\nChapter Terbaru: " + manga.latest_chapter?.title
-          );
-        };
+      card.onclick = () => loadDetail(manga.slug);
+      mangaList.appendChild(card);
+    });
 
-        mangaList.appendChild(card);
-      });
+    currentPage = json.meta.page;
+    pageInfo.textContent = `Halaman ${currentPage}`;
+    prevBtn.disabled = !json.meta.prev_page;
+    nextBtn.disabled = !json.meta.next_page;
+  }
 
-      currentPage = json.meta.page;
-      pageInfo.textContent = `Halaman ${currentPage}`;
+  async function loadDetail(slug) {
+    listView.style.display = "none";
+    detailView.style.display = "block";
 
-      prevBtn.disabled = !json.meta.prev_page;
-      nextBtn.disabled = !json.meta.next_page;
+    const res = await fetch(`${API}/detail/${slug}`);
+    const json = await res.json();
+    const d = json.data;
 
-    } catch (err) {
-      mangaList.innerHTML = "Gagal memuat data 😢";
-      console.error(err);
-    }
+    document.getElementById("detailThumb").src = d.thumbnail;
+    document.getElementById("detailTitle").textContent = d.title;
+    document.getElementById("detailMeta").innerHTML =
+      `⭐ ${d.rating} | ${d.type} | ${d.status}`;
+
+    document.getElementById("detailSynopsis").textContent = d.synopsis;
+
+    const genresEl = document.getElementById("detailGenres");
+    genresEl.innerHTML = "";
+    d.genres.forEach(g => {
+      genresEl.innerHTML += `<span>${g}</span>`;
+    });
+
+    const chapterList = document.getElementById("chapterList");
+    chapterList.innerHTML = "<h3>📖 Daftar Chapter</h3>";
+
+    d.chapters.forEach(ch => {
+      const div = document.createElement("div");
+      div.className = "chapter";
+      div.textContent = ch.title;
+      div.onclick = () => alert("Slug chapter: " + ch.slug);
+      chapterList.appendChild(div);
+    });
+  }
+
+  function showList() {
+    detailView.style.display = "none";
+    listView.style.display = "block";
   }
 
   prevBtn.onclick = () => loadManga(currentPage - 1);
