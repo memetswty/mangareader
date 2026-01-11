@@ -21,7 +21,30 @@ header {
   font-weight: bold;
 }
 
-/* ===== LIST ===== */
+/* === NAV === */
+.nav {
+  display: flex;
+  justify-content: center;
+  background: #181818;
+}
+
+.nav button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: none;
+  color: #aaa;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.nav button.active {
+  color: #fff;
+  background: #222;
+  border-bottom: 2px solid #fff;
+}
+
+/* === LIST === */
 .container {
   padding: 15px;
   display: grid;
@@ -56,28 +79,10 @@ header {
   color: #ccc;
 }
 
-/* ===== DETAIL ===== */
+/* === DETAIL & READER === */
 .detail, .reader {
   display: none;
   padding: 15px;
-}
-
-.detail-header {
-  display: flex;
-  gap: 15px;
-}
-
-.detail-header img {
-  width: 160px;
-  border-radius: 8px;
-}
-
-.genres span {
-  background: #333;
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 12px;
-  margin-right: 5px;
 }
 
 .chapter {
@@ -88,7 +93,6 @@ header {
   cursor: pointer;
 }
 
-/* ===== READER ===== */
 .reader img {
   width: 100%;
   margin-bottom: 10px;
@@ -102,7 +106,6 @@ header {
 
 button {
   padding: 8px 14px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
@@ -113,9 +116,9 @@ button:disabled {
 }
 
 .back-btn {
-  margin-bottom: 15px;
   background: #444;
-  color: white;
+  color: #fff;
+  margin-bottom: 10px;
 }
 </style>
 </head>
@@ -124,6 +127,12 @@ button:disabled {
 
 <header>📚 Komik Reader</header>
 
+<!-- NAVIGATION -->
+<div class="nav">
+  <button id="tabAll" class="active">📚 Semua Komik</button>
+  <button id="tabLatest">🆕 Komik Terbaru</button>
+</div>
+
 <!-- LIST -->
 <div id="listView">
   <div class="container" id="mangaList"></div>
@@ -131,67 +140,74 @@ button:disabled {
 
 <!-- DETAIL -->
 <div class="detail" id="detailView">
-  <button class="back-btn" onclick="showList()">⬅ Kembali</button>
-  <div class="detail-header">
-    <img id="detailThumb">
-    <div>
-      <h2 id="detailTitle"></h2>
-      <div id="detailMeta"></div>
-      <div class="genres" id="detailGenres"></div>
-    </div>
-  </div>
+  <button class="back-btn" onclick="backToList()">⬅ Kembali</button>
+  <h2 id="detailTitle"></h2>
+  <img id="detailThumb" style="width:150px;border-radius:8px">
   <p id="detailSynopsis"></p>
-  <h3>📖 Daftar Chapter</h3>
+  <h3>📖 Chapter</h3>
   <div id="chapterList"></div>
 </div>
 
 <!-- READER -->
 <div class="reader" id="readerView">
-  <button class="back-btn" onclick="backToDetail()">⬅ Kembali ke Detail</button>
-
+  <button class="back-btn" onclick="backToDetail()">⬅ Kembali</button>
   <h2 id="chapterTitle"></h2>
-
   <div class="nav-btns">
     <button id="prevChapter">⬅ Sebelumnya</button>
     <button id="nextChapter">Lanjut ➡</button>
   </div>
-
   <div id="imageContainer"></div>
 </div>
 
 <script>
 const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
 
+const mangaList = document.getElementById("mangaList");
 const listView = document.getElementById("listView");
 const detailView = document.getElementById("detailView");
 const readerView = document.getElementById("readerView");
 
-let currentMangaSlug = "";
-let currentChapterSlug = "";
+const tabAll = document.getElementById("tabAll");
+const tabLatest = document.getElementById("tabLatest");
 
-async function loadManga() {
+let currentChapter = "";
+
+/* ===== LIST ALL ===== */
+async function loadAllManga() {
+  setActiveTab(tabAll);
   const res = await fetch(API);
   const json = await res.json();
-  const list = document.getElementById("mangaList");
-  list.innerHTML = "";
+  renderList(json.data);
+}
 
-  json.data.forEach(m => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
+/* ===== LIST LATEST ===== */
+async function loadLatestManga() {
+  setActiveTab(tabLatest);
+  const res = await fetch(`${API}/latest`);
+  const json = await res.json();
+  renderList(json.data);
+}
+
+/* ===== RENDER LIST ===== */
+function renderList(data) {
+  mangaList.innerHTML = "";
+  data.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
       <img src="${m.thumbnail}">
       <div class="card-body">
         <div class="title">${m.title}</div>
         <div class="info">${m.latest_chapter?.title || ""}</div>
       </div>
     `;
-    card.onclick = () => loadDetail(m.slug);
-    list.appendChild(card);
+    div.onclick = () => loadDetail(m.slug);
+    mangaList.appendChild(div);
   });
 }
 
+/* ===== DETAIL ===== */
 async function loadDetail(slug) {
-  currentMangaSlug = slug;
   listView.style.display = "none";
   detailView.style.display = "block";
 
@@ -199,29 +215,24 @@ async function loadDetail(slug) {
   const json = await res.json();
   const d = json.data;
 
-  document.getElementById("detailThumb").src = d.thumbnail;
   document.getElementById("detailTitle").textContent = d.title;
-  document.getElementById("detailMeta").textContent =
-    `⭐ ${d.rating} | ${d.type} | ${d.status}`;
+  document.getElementById("detailThumb").src = d.thumbnail;
   document.getElementById("detailSynopsis").textContent = d.synopsis;
 
-  const g = document.getElementById("detailGenres");
-  g.innerHTML = "";
-  d.genres.forEach(x => g.innerHTML += `<span>${x}</span>`);
-
-  const c = document.getElementById("chapterList");
-  c.innerHTML = "";
-  d.chapters.forEach(ch => {
+  const cl = document.getElementById("chapterList");
+  cl.innerHTML = "";
+  d.chapters.forEach(c => {
     const div = document.createElement("div");
     div.className = "chapter";
-    div.textContent = ch.title;
-    div.onclick = () => loadChapter(ch.slug);
-    c.appendChild(div);
+    div.textContent = c.title;
+    div.onclick = () => loadChapter(c.slug);
+    cl.appendChild(div);
   });
 }
 
+/* ===== CHAPTER ===== */
 async function loadChapter(slug) {
-  currentChapterSlug = slug;
+  currentChapter = slug;
   detailView.style.display = "none";
   readerView.style.display = "block";
 
@@ -231,14 +242,13 @@ async function loadChapter(slug) {
 
   document.getElementById("chapterTitle").textContent = d.title;
 
-  const imgBox = document.getElementById("imageContainer");
-  imgBox.innerHTML = "";
-
-  d.images.forEach(src => {
+  const box = document.getElementById("imageContainer");
+  box.innerHTML = "";
+  d.images.forEach(imgUrl => {
     const img = document.createElement("img");
-    img.src = src;
-    img.loading = "lazy"; // 🔥 LAZY LOAD
-    imgBox.appendChild(img);
+    img.src = imgUrl;
+    img.loading = "lazy";
+    box.appendChild(img);
   });
 
   document.getElementById("prevChapter").disabled = !d.previous_chapter_slug;
@@ -246,12 +256,18 @@ async function loadChapter(slug) {
 
   document.getElementById("prevChapter").onclick =
     () => loadChapter(d.previous_chapter_slug);
-
   document.getElementById("nextChapter").onclick =
     () => loadChapter(d.next_chapter_slug);
 }
 
-function showList() {
+/* ===== NAV ===== */
+function setActiveTab(tab) {
+  tabAll.classList.remove("active");
+  tabLatest.classList.remove("active");
+  tab.classList.add("active");
+}
+
+function backToList() {
   detailView.style.display = "none";
   readerView.style.display = "none";
   listView.style.display = "block";
@@ -262,7 +278,10 @@ function backToDetail() {
   detailView.style.display = "block";
 }
 
-loadManga();
+tabAll.onclick = loadAllManga;
+tabLatest.onclick = loadLatestManga;
+
+loadAllManga();
 </script>
 
 </body>
