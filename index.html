@@ -2,221 +2,1128 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Komik Reader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box;font-family:system-ui}
-body{margin:0;background:#111;color:#fff}
-button{cursor:pointer}
-
-/* SEARCH */
-.search-wrap{padding:12px;background:#181818}
-.search-box{position:relative}
-.search-box input{
-  width:100%;padding:12px 42px 12px 14px;
-  border-radius:25px;border:none;
-  background:#2a2a2a;color:#fff
-}
-.search-action{
-  position:absolute;right:6px;top:50%;
-  transform:translateY(-50%) scale(.8);
-  display:flex;gap:6px;
-  opacity:0;pointer-events:none;transition:.25s
-}
-.search-action.show{opacity:1;transform:translateY(-50%) scale(1);pointer-events:auto}
-.search-action button{width:32px;height:32px;border-radius:50%;border:none}
-
-/* NAV */
-.nav{display:flex;position:relative;background:#181818}
-.nav button{flex:1;padding:14px;background:none;border:none;color:#aaa;font-weight:bold}
-.nav button.active{color:#fff}
-.nav-indicator{position:absolute;bottom:0;height:3px;width:50%;background:#fff;transition:.35s}
-
-/* CONTENT */
-#content{padding:10px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-  gap:10px
-}
-.card{
-  background:#1c1c1c;border-radius:8px;overflow:hidden;
-  transition:.2s
-}
-.card:hover{transform:scale(1.03)}
-.card img{width:100%;aspect-ratio:3/4;object-fit:cover}
-.card .info{padding:6px;font-size:13px}
-
-/* DETAIL */
-.detail img{width:150px;border-radius:8px}
-.chapters button{
-  width:100%;margin:4px 0;padding:10px;
-  border:none;background:#222;color:#fff;border-radius:6px
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #111;
+  color: #fff;
+  transition: background 0.3s ease;
 }
 
-/* READER */
-.reader img{width:100%;display:block;margin-bottom:6px}
-.reader-nav{display:flex;gap:10px;margin:10px 0}
-.reader-nav button{flex:1;padding:12px;border:none;border-radius:6px;background:#222;color:#fff}
-
-/* BOOKMARK */
-.bookmark-btn{
-  margin:8px 0;padding:10px;
-  background:#ffcc00;color:#000;border:none;border-radius:6px;font-weight:bold
+header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 18px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
 }
-.section-title{margin-top:20px}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+}
+
+/* ===== SEARCH ===== */
+.search-wrap {
+  background: #181818;
+  padding: 15px;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  transition: all 0.3s ease;
+  opacity: 1;
+}
+
+.search-box.hidden {
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid #2a2a2a;
+  outline: none;
+  background: #222;
+  color: #fff;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: #4ecdc4;
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+}
+
+.search-box button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.search-box button:hover {
+  transform: scale(1.05);
+  background: #4ecdc4;
+}
+
+.clear-btn {
+  background: #444;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+.clear-btn.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* autosuggest */
+.suggest {
+  background: #222;
+  border-radius: 12px;
+  margin-top: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  position: absolute;
+  width: 100%;
+  z-index: 100;
+  border: 1px solid #333;
+}
+
+.suggest.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.suggest div {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+  transition: background 0.2s ease;
+}
+
+.suggest div:hover {
+  background: #2a2a2a;
+}
+
+.suggest div:last-child {
+  border-bottom: none;
+}
+
+/* ===== FILTER ===== */
+.filter {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  animation: fadeIn 0.5s ease;
+}
+
+.filter select {
+  flex: 1;
+  padding: 10px 14px;
+  background: #222;
+  color: #fff;
+  border: 2px solid #2a2a2a;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.filter select:focus {
+  border-color: #4ecdc4;
+}
+
+/* ===== NAV TABS ===== */
+.nav {
+  display: flex;
+  background: #181818;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #333;
+}
+
+.nav button {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  background: none;
+  color: #aaa;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.nav button:hover {
+  background: #222;
+  color: #fff;
+}
+
+.nav button.active {
+  color: #4ecdc4;
+  background: #1a1a1a;
+}
+
+.nav button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(90deg, #4ecdc4, #45b7d1);
+  border-radius: 3px 3px 0 0;
+  animation: slideIn 0.3s ease;
+}
+
+/* ===== BOOKMARK & HISTORY BUTTONS ===== */
+.bookmark-history {
+  display: flex;
+  background: #181818;
+  padding: 10px 15px;
+  gap: 10px;
+  border-bottom: 1px solid #2a2a2a;
+  animation: fadeIn 0.5s ease;
+}
+
+.bookmark-history button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #222;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.bookmark-history button:hover {
+  background: #2a2a2a;
+  transform: translateY(-2px);
+}
+
+.bookmark-history button.active {
+  background: linear-gradient(135deg, #4ecdc4 0%, #45b7d1 100%);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+}
+
+/* ===== LIST ===== */
+.container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.card {
+  background: #1c1c1c;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+}
+
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bookmark-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.bookmark-icon:hover {
+  background: rgba(78, 205, 196, 0.9);
+  transform: scale(1.1);
+}
+
+.bookmark-icon.bookmarked {
+  color: #ffd93d;
+}
+
+mark {
+  background: linear-gradient(120deg, #ffd93d 0%, #ffd93d 100%);
+  color: #000;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.pagination button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #222;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #2a2a2a;
+  transform: translateY(-2px);
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== DETAIL & READER ===== */
+.detail, .reader {
+  display: none;
+  padding: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.chapter {
+  background: #1c1c1c;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 3px solid transparent;
+}
+
+.chapter:hover {
+  background: #222;
+  transform: translateX(5px);
+  border-left-color: #4ecdc4;
+}
+
+.chapter.read {
+  opacity: 0.7;
+}
+
+.chapter.read::after {
+  content: '✓';
+  color: #4ecdc4;
+  font-weight: bold;
+}
+
+.reader img {
+  width: 100%;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.8s ease;
+}
+
+.nav-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.nav-btns button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.nav-btns button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-btns button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.back-btn {
+  background: #2a2a2a;
+  color: #fff;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  background: #333;
+  transform: translateX(-3px);
+}
+
+/* ===== HISTORY LIST ===== */
+.history-item {
+  background: #1c1c1c;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.history-item:hover {
+  background: #222;
+  transform: translateX(5px);
+}
+
+.history-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.history-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+}
+
+.history-info p {
+  margin: 0;
+  color: #aaa;
+  font-size: 14px;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { width: 0; opacity: 0; }
+  to { width: 60%; opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ===== LOADING ===== */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #4ecdc4;
+  animation: pulse 1.5s infinite;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .card img {
+    height: 190px;
+  }
+  
+  .nav button {
+    padding: 14px;
+    font-size: 14px;
+  }
+  
+  .bookmark-history button {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  
+  .card img {
+    height: 170px;
+  }
+  
+  .nav {
+    flex-wrap: wrap;
+  }
+  
+  .nav button {
+    flex: 0 0 50%;
+  }
+}
 </style>
 </head>
 
 <body>
 
+<header>📚 Komik Reader</header>
+
+<!-- SEARCH -->
 <div class="search-wrap">
-  <div class="search-box">
-    <input id="searchInput" placeholder="Cari judul komik...">
-    <div id="searchAction" class="search-action">
-      <button onclick="searchManga()">🔍</button>
-      <button onclick="clearSearch()">❌</button>
+  <div class="search-container">
+    <div class="search-box" id="searchBox">
+      <input id="searchInput" placeholder="Cari judul komik...">
+      <button id="searchBtn" onclick="searchManga()">🔍</button>
+      <button class="clear-btn" id="clearBtn" onclick="clearSearch()">❌</button>
     </div>
+    
+    <div id="suggestBox" class="suggest"></div>
+  </div>
+
+  <div class="filter">
+    <select id="typeFilter" onchange="applyFilter()">
+      <option value="">Semua Type</option>
+      <option value="Manga">Manga</option>
+      <option value="Manhwa">Manhwa</option>
+      <option value="Manhua">Manhua</option>
+    </select>
   </div>
 </div>
 
+<!-- BOOKMARK & HISTORY -->
+<div class="bookmark-history">
+  <button id="bookmarkBtn" onclick="showBookmarks()">⭐ Bookmark</button>
+  <button id="historyBtn" onclick="showHistory()">📖 History</button>
+</div>
+
+<!-- NAV TABS -->
 <div class="nav">
   <button id="tabAll" class="active">📚 Semua</button>
   <button id="tabLatest">🆕 Terbaru</button>
-  <div id="navIndicator" class="nav-indicator"></div>
 </div>
 
-<div id="content"></div>
+<!-- LIST VIEW -->
+<div id="listView">
+  <div class="container" id="mangaList"></div>
+
+  <div class="pagination">
+    <button id="prevPage">⬅ Prev</button>
+    <button id="nextPage">Next ➡</button>
+  </div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div class="detail" id="detailView">
+  <button class="back-btn" onclick="backToList()">⬅ Kembali</button>
+  <h2 id="detailTitle"></h2>
+  <img id="detailThumb" style="width:180px;border-radius:12px;margin:15px 0">
+  <p id="detailSynopsis" style="line-height:1.6;color:#ccc;"></p>
+  <h3>📖 Chapter</h3>
+  <div id="chapterList"></div>
+</div>
+
+<!-- READER VIEW -->
+<div class="reader" id="readerView">
+  <button class="back-btn" onclick="backToDetail()">⬅ Kembali</button>
+  <h2 id="chapterTitle"></h2>
+  <div class="nav-btns">
+    <button id="prevChapter">⬅ Sebelumnya</button>
+    <button id="nextChapter">Lanjut ➡</button>
+  </div>
+  <div id="imageContainer"></div>
+</div>
 
 <script>
-const API="https://unofficial-komikcast-api.vercel.app";
-const content=document.getElementById("content");
-const searchInput=document.getElementById("searchInput");
-const searchAction=document.getElementById("searchAction");
-const navIndicator=document.getElementById("navIndicator");
-const tabAll=document.getElementById("tabAll");
-const tabLatest=document.getElementById("tabLatest");
+const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
 
-let page=1, mode="all", loading=false, lastData=[];
+// DOM Elements
+const mangaList = document.getElementById("mangaList");
+const suggestBox = document.getElementById("suggestBox");
+const searchInput = document.getElementById("searchInput");
+const searchBtn = document.getElementById("searchBtn");
+const clearBtn = document.getElementById("clearBtn");
+const searchBox = document.getElementById("searchBox");
 
-/* SEARCH UX */
-searchInput.oninput=e=>{
-  searchAction.classList.toggle("show",e.target.value.trim());
-};
+// State Management
+let mode = "all";
+let searchQuery = "";
+let searchPage = 1;
+let allDataCache = [];
+let bookmarks = JSON.parse(localStorage.getItem("komikBookmarks")) || [];
+let history = JSON.parse(localStorage.getItem("komikHistory")) || [];
+let currentView = "list";
 
-/* TAB */
-function setTab(tab){
-  tabAll.classList.remove("active");
-  tabLatest.classList.remove("active");
-  tab.classList.add("active");
-  navIndicator.style.transform=tab===tabAll?"translateX(0%)":"translateX(100%)";
-  page=1;lastData=[];content.innerHTML="";
+/* ===== UTILITIES ===== */
+function highlight(text) {
+  if (!searchQuery) return text;
+  return text.replace(
+    new RegExp(`(${searchQuery})`, "gi"),
+    "<mark>$1</mark>"
+  );
 }
-tabAll.onclick=()=>{setTab(tabAll);mode="all";loadMore();}
-tabLatest.onclick=()=>{setTab(tabLatest);mode="latest";loadMore();}
 
-/* INFINITE SCROLL */
-window.onscroll=()=>{
-  if(window.innerHeight+window.scrollY>=document.body.offsetHeight-300){
-    loadMore();
+function saveToLocalStorage() {
+  localStorage.setItem("komikBookmarks", JSON.stringify(bookmarks));
+  localStorage.setItem("komikHistory", JSON.stringify(history));
+}
+
+function addToHistory(manga, chapter) {
+  const existingIndex = history.findIndex(h => 
+    h.mangaSlug === manga.slug && h.chapterSlug === chapter.slug
+  );
+  
+  if (existingIndex !== -1) {
+    history.splice(existingIndex, 1);
   }
-};
-
-async function loadMore(){
-  if(loading) return;
-  loading=true;
-  let url="";
-  if(mode==="all") url=`/komikcast/${page}`;
-  if(mode==="latest") url="/komikcast/latest";
-  if(mode==="search") url=`/komikcast/search?q=${searchInput.value}&page=${page}`;
-  const res=await fetch(API+url);
-  const j=await res.json();
-  const data=j.data||[];
-  lastData=[...lastData,...data];
-  renderGrid(lastData);
-  page++;loading=false;
+  
+  history.unshift({
+    mangaSlug: manga.slug,
+    mangaTitle: manga.title,
+    mangaThumb: manga.thumbnail,
+    chapterTitle: chapter.title,
+    chapterSlug: chapter.slug,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Keep only last 50 items
+  if (history.length > 50) history.pop();
+  
+  saveToLocalStorage();
 }
 
-/* GRID */
-function renderGrid(data){
-  content.innerHTML=`<div class="grid">${
-    data.map(m=>`
-      <div class="card" onclick="loadDetail('${m.slug}')">
-        <img loading="lazy" src="${m.thumbnail}">
-        <div class="info">${m.title}</div>
-      </div>`).join("")
-  }</div>`;
+function isBookmarked(slug) {
+  return bookmarks.some(b => b.slug === slug);
 }
 
-/* DETAIL */
-async function loadDetail(slug){
-  const res=await fetch(API+"/komikcast/detail/"+slug);
-  const d=(await res.json()).data;
-  const bookmarked=isBookmarked(slug);
-  content.innerHTML=`
-    <div class="detail">
-      <img src="${d.thumbnail}">
-      <h2>${d.title}</h2>
-      <button class="bookmark-btn" onclick="toggleBookmark('${slug}','${d.title}','${d.thumbnail}')">
-        ${bookmarked?"★ Bookmarked":"☆ Bookmark"}
-      </button>
-      <p>${d.synopsis}</p>
-      <div class="chapters">
-        ${d.chapters.map(c=>`
-          <button onclick="loadChapter('${c.slug}','${d.title}')">${c.title}</button>`).join("")}
-      </div>
-    </div>`;
+function toggleBookmark(manga) {
+  const index = bookmarks.findIndex(b => b.slug === manga.slug);
+  
+  if (index === -1) {
+    bookmarks.push({
+      slug: manga.slug,
+      title: manga.title,
+      thumbnail: manga.thumbnail,
+      type: manga.type,
+      addedAt: new Date().toISOString()
+    });
+  } else {
+    bookmarks.splice(index, 1);
+  }
+  
+  saveToLocalStorage();
+  renderList(allDataCache);
+  
+  // Show feedback
+  const feedback = document.createElement("div");
+  feedback.textContent = index === -1 ? "✓ Ditambahkan ke bookmark" : "✓ Dihapus dari bookmark";
+  feedback.style.cssText = `
+    position: fixed; top: 20px; right: 20px; background: #4ecdc4; color: white;
+    padding: 12px 20px; border-radius: 8px; z-index: 1000; font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease;
+  `;
+  document.body.appendChild(feedback);
+  
+  setTimeout(() => {
+    feedback.style.animation = "fadeIn 0.3s ease reverse";
+    setTimeout(() => feedback.remove(), 300);
+  }, 2000);
 }
 
-/* READER + HISTORY */
-async function loadChapter(slug,title){
-  const res=await fetch(API+"/komikcast/chapter/"+slug);
-  const d=(await res.json()).data;
-  saveHistory(title,slug);
-  content.innerHTML=`
-    <h3>${d.title}</h3>
-    <div class="reader">
-      ${d.images.map(i=>`<img loading="lazy" src="${i}">`).join("")}
+/* ===== VIEW MANAGEMENT ===== */
+function showLoading() {
+  mangaList.innerHTML = `
+    <div class="loading">
+      <div>Memuat...</div>
     </div>
-    <div class="reader-nav">
-      <button ${!d.previous_chapter_slug?"disabled":""}
-        onclick="loadChapter('${d.previous_chapter_slug}','${title}')">⬅ Sebelumnya</button>
-      <button ${!d.next_chapter_slug?"disabled":""}
-        onclick="loadChapter('${d.next_chapter_slug}','${title}')">Selanjutnya ➡</button>
-    </div>`;
+  `;
 }
 
-/* SEARCH */
-function searchManga(){
-  if(!searchInput.value.trim())return;
-  mode="search";page=1;lastData=[];content.innerHTML="";
-  loadMore();
-}
-function clearSearch(){
-  searchInput.value="";searchAction.classList.remove("show");
-  setTab(tabAll);mode="all";loadMore();
+function setActiveTab(tabId) {
+  document.querySelectorAll(".nav button").forEach(btn => {
+    btn.classList.remove("active");
+  });
+  document.getElementById(tabId).classList.add("active");
 }
 
-/* BOOKMARK */
-function getBookmarks(){return JSON.parse(localStorage.getItem("bm")||"[]")}
-function isBookmarked(slug){return getBookmarks().some(b=>b.slug===slug)}
-function toggleBookmark(slug,title,thumb){
-  let bm=getBookmarks();
-  bm=isBookmarked(slug)?bm.filter(b=>b.slug!==slug):[...bm,{slug,title,thumb}];
-  localStorage.setItem("bm",JSON.stringify(bm));
-  loadDetail(slug);
+function setActiveView(view) {
+  currentView = view;
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").style.display = "none";
+  document.getElementById("readerView").style.display = "none";
+  document.getElementById(`${view}View`).style.display = "block";
 }
 
-/* HISTORY */
-function saveHistory(title,slug){
-  let h=JSON.parse(localStorage.getItem("history")||"[]");
-  h=[{title,slug,date:Date.now()},...h.filter(x=>x.slug!==slug)].slice(0,20);
-  localStorage.setItem("history",JSON.stringify(h));
+/* ===== DATA LOADING ===== */
+async function loadAllManga() {
+  mode = "all";
+  setActiveTab("tabAll");
+  showLoading();
+  
+  try {
+    const res = await fetch(API);
+    const json = await res.json();
+    allDataCache = json.data;
+    renderList(allDataCache);
+  } catch (error) {
+    mangaList.innerHTML = `<p style="color:#ff6b6b;text-align:center;padding:40px">Gagal memuat data. Coba lagi nanti.</p>`;
+    console.error("Error loading all manga:", error);
+  }
 }
 
-/* INIT */
-loadMore();
+async function loadLatestManga() {
+  mode = "latest";
+  setActiveTab("tabLatest");
+  showLoading();
+  
+  try {
+    const res = await fetch(`${API}/latest`);
+    const json = await res.json();
+    allDataCache = json.data;
+    renderList(allDataCache);
+  } catch (error) {
+    mangaList.innerHTML = `<p style="color:#ff6b6b;text-align:center;padding:40px">Gagal memuat data terbaru.</p>`;
+    console.error("Error loading latest manga:", error);
+  }
+}
+
+async function searchManga(page = 1) {
+  searchQuery = searchInput.value.trim();
+  if (!searchQuery) return;
+  
+  mode = "search";
+  searchPage = page;
+  showLoading();
+  
+  try {
+    const res = await fetch(`${API}/search?q=${encodeURIComponent(searchQuery)}&page=${page}`);
+    const json = await res.json();
+    
+    allDataCache = json.data || [];
+    renderList(allDataCache);
+    
+    document.getElementById("prevPage").disabled = !(json.meta?.pagination?.previous_page);
+    document.getElementById("nextPage").disabled = !(json.meta?.pagination?.next_page);
+  } catch (error) {
+    mangaList.innerHTML = `<p style="color:#ff6b6b;text-align:center;padding:40px">Gagal melakukan pencarian.</p>`;
+    console.error("Error searching manga:", error);
+  }
+}
+
+/* ===== RENDER FUNCTIONS ===== */
+function renderList(data) {
+  mangaList.innerHTML = "";
+  
+  if (data.length === 0) {
+    mangaList.innerHTML = `
+      <div style="text-align:center;padding:40px;color:#aaa;grid-column:1/-1">
+        <div style="font-size:48px;margin-bottom:10px">📭</div>
+        <p>Tidak ada komik yang ditemukan</p>
+      </div>
+    `;
+    return;
+  }
+  
+  data.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "card";
+    const isBookmark = isBookmarked(m.slug);
+    
+    div.innerHTML = `
+      <div class="bookmark-icon ${isBookmark ? 'bookmarked' : ''}" onclick="event.stopPropagation(); toggleBookmark(${JSON.stringify(m).replace(/"/g, '&quot;')})">
+        ${isBookmark ? '⭐' : '☆'}
+      </div>
+      <img src="${m.thumbnail || 'https://via.placeholder.com/150x220/2a2a2a/fff?text=No+Image'}" alt="${m.title}">
+      <div class="card-body">
+        <div class="title">${highlight(m.title)}</div>
+      </div>
+    `;
+    
+    div.onclick = () => loadDetail(m.slug);
+    mangaList.appendChild(div);
+  });
+}
+
+function showBookmarks() {
+  mode = "bookmarks";
+  document.getElementById("bookmarkBtn").classList.add("active");
+  document.getElementById("historyBtn").classList.remove("active");
+  
+  if (bookmarks.length === 0) {
+    mangaList.innerHTML = `
+      <div style="text-align:center;padding:40px;color:#aaa;grid-column:1/-1">
+        <div style="font-size:48px;margin-bottom:10px">⭐</div>
+        <p>Belum ada bookmark</p>
+      </div>
+    `;
+  } else {
+    renderList(bookmarks);
+  }
+}
+
+function showHistory() {
+  mode = "history";
+  document.getElementById("historyBtn").classList.add("active");
+  document.getElementById("bookmarkBtn").classList.remove("active");
+  
+  if (history.length === 0) {
+    mangaList.innerHTML = `
+      <div style="text-align:center;padding:40px;color:#aaa;grid-column:1/-1">
+        <div style="font-size:48px;margin-bottom:10px">📖</div>
+        <p>Belum ada riwayat baca</p>
+      </div>
+    `;
+  } else {
+    mangaList.innerHTML = "";
+    history.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "history-item";
+      div.innerHTML = `
+        <img src="${item.mangaThumb}" alt="${item.mangaTitle}">
+        <div class="history-info">
+          <h4>${item.mangaTitle}</h4>
+          <p>${item.chapterTitle}</p>
+          <p style="font-size:12px;color:#666;">${new Date(item.timestamp).toLocaleDateString()}</p>
+        </div>
+      `;
+      div.onclick = () => loadChapter(item.chapterSlug);
+      mangaList.appendChild(div);
+    });
+  }
+}
+
+/* ===== DETAIL & CHAPTER ===== */
+async function loadDetail(slug) {
+  setActiveView("detail");
+  showLoadingInDetail();
+  
+  try {
+    const res = await fetch(`${API}/detail/${slug}`);
+    const json = await res.json();
+    const d = json.data;
+    
+    document.getElementById("detailTitle").textContent = d.title || "Judul tidak tersedia";
+    document.getElementById("detailThumb").src = d.thumbnail || "";
+    document.getElementById("detailSynopsis").textContent = d.synopsis || "Sinopsis tidak tersedia";
+    
+    const chapterList = document.getElementById("chapterList");
+    chapterList.innerHTML = "";
+    
+    if (d.chapters && d.chapters.length > 0) {
+      d.chapters.forEach(c => {
+        const isRead = history.some(h => h.chapterSlug === c.slug);
+        const div = document.createElement("div");
+        div.className = `chapter ${isRead ? 'read' : ''}`;
+        div.textContent = c.title || "Chapter";
+        div.onclick = () => loadChapter(c.slug, d);
+        chapterList.appendChild(div);
+      });
+    } else {
+      chapterList.innerHTML = "<p>Tidak ada chapter tersedia</p>";
+    }
+  } catch (error) {
+    document.getElementById("detailTitle").textContent = "Error";
+    document.getElementById("detailSynopsis").textContent = "Gagal memuat detail komik. Coba lagi nanti.";
+    console.error("Error loading detail:", error);
+  }
+}
+
+function showLoadingInDetail() {
+  document.getElementById("detailTitle").textContent = "Memuat...";
+  document.getElementById("chapterList").innerHTML = `
+    <div class="loading" style="padding:20px">
+      <div>Memuat chapter...</div>
+    </div>
+  `;
+}
+
+async function loadChapter(slug, manga = null) {
+  setActiveView("reader");
+  document.getElementById("imageContainer").innerHTML = `
+    <div class="loading" style="padding:40px">
+      <div>Memuat chapter...</div>
+    </div>
+  `;
+  
+  try {
+    const res = await fetch(`${API}/chapter/${slug}`);
+    const json = await res.json();
+    const d = json.data;
+    
+    document.getElementById("chapterTitle").textContent = d.title || "Chapter";
+    
+    const imageContainer = document.getElementById("imageContainer");
+    imageContainer.innerHTML = "";
+    
+    if (d.images && d.images.length > 0) {
+      d.images.forEach(i => {
+        const img = document.createElement("img");
+        img.src = i;
+        img.loading = "lazy";
+        img.onerror = function() {
+          this.src = "https://via.placeholder.com/800x1000/2a2a2a/fff?text=Gambar+Tidak+Tersedia";
+        };
+        imageContainer.appendChild(img);
+      });
+      
+      // Add to history if manga info is available
+      if (manga) {
+        addToHistory(manga, d);
+      }
+    } else {
+      imageContainer.innerHTML = "<p style='text-align:center;color:#aaa;padding:40px'>Tidak ada gambar tersedia</p>";
+    }
+    
+    // Set up navigation
+    document.getElementById("prevChapter").disabled = !d.previous_chapter_slug;
+    document.getElementById("nextChapter").disabled = !d.next_chapter_slug;
+    
+    document.getElementById("prevChapter").onclick = d.previous_chapter_slug ? 
+      () => loadChapter(d.previous_chapter_slug, manga) : null;
+    
+    document.getElementById("nextChapter").onclick = d.next_chapter_slug ? 
+      () => loadChapter(d.next_chapter_slug, manga) : null;
+  } catch (error) {
+    document.getElementById("imageContainer").innerHTML = `
+      <p style="color:#ff6b6b;text-align:center;padding:40px">
+        Gagal memuat chapter. Coba lagi nanti.
+      </p>
+    `;
+    console.error("Error loading chapter:", error);
+  }
+}
+
+/* ===== SEARCH INTERACTIONS ===== */
+let debounceTimer;
+searchInput.addEventListener("input", e => {
+  const val = e.target.value.trim();
+  
+  // Show/hide clear button
+  if (val) {
+    clearBtn.classList.add("show");
+  } else {
+    clearBtn.classList.remove("show");
+  }
+  
+  // Auto-suggest
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    if (!val) {
+      suggestBox.classList.remove("show");
+      return;
+    }
+    
+    const results = allDataCache
+      .filter(m => m.title.toLowerCase().includes(val.toLowerCase()))
+      .slice(0, 8);
+    
+    suggestBox.innerHTML = "";
+    
+    if (results.length > 0) {
+      results.forEach(r => {
+        const div = document.createElement("div");
+        div.innerHTML = highlight(r.title);
+        div.onclick = () => {
+          searchInput.value = r.title;
+          suggestBox.classList.remove("show");
+          searchManga();
+        };
+        suggestBox.appendChild(div);
+      });
+      suggestBox.classList.add("show");
+    } else {
+      suggestBox.classList.remove("show");
+    }
+  }, 300);
+});
+
+// Hide suggest when clicking outside
+document.addEventListener("click", (e) => {
+  if (!suggestBox.contains(e.target) && !searchInput.contains(e.target)) {
+    suggestBox.classList.remove("show");
+  }
+});
+
+function clearSearch() {
+  searchInput.value = "";
+  clearBtn.classList.remove("show");
+  suggestBox.classList.remove("show");
+  loadAllManga();
+}
+
+/* ===== FILTER ===== */
+function applyFilter() {
+  const type = document.getElementById("typeFilter").value;
+  let filtered = allDataCache;
+  
+  if (type) {
+    filtered = filtered.filter(m => m.type === type);
+  }
+  
+  renderList(filtered);
+}
+
+/* ===== NAVIGATION ===== */
+function backToList() {
+  setActiveView("list");
+  
+  // Restore appropriate view
+  if (mode === "bookmarks") {
+    showBookmarks();
+  } else if (mode === "history") {
+    showHistory();
+  } else if (mode === "latest") {
+    loadLatestManga();
+  } else {
+    loadAllManga();
+  }
+}
+
+function backToDetail() {
+  setActiveView("detail");
+}
+
+// Event Listeners
+document.getElementById("prevPage").onclick = () => searchManga(searchPage - 1);
+document.getElementById("nextPage").onclick = () => searchManga(searchPage + 1);
+
+document.getElementById("tabAll").onclick = loadAllManga;
+document.getElementById("tabLatest").onclick = loadLatestManga;
+
+// Initialize
+window.onload = function() {
+  loadAllManga();
+  
+  // Add keyboard shortcuts
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && currentView === "reader") {
+      backToDetail();
+    }
+    if (e.key === "Enter" && document.activeElement === searchInput) {
+      searchManga();
+    }
+  });
+};
 </script>
 
 </body>
