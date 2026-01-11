@@ -1,263 +1,268 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Komik Reader</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Komik Reader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+}
 
-    header {
-      background: #1f1f1f;
-      padding: 15px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-    }
+header {
+  background: #1f1f1f;
+  padding: 15px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
 
-    /* ===== LIST ===== */
-    .container {
-      padding: 15px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-    }
+/* ===== LIST ===== */
+.container {
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
 
-    .card {
-      background: #1c1c1c;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
+.card {
+  background: #1c1c1c;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
 
-    .card:hover {
-      transform: scale(1.05);
-    }
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
 
-    .card img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-    }
+.card-body {
+  padding: 10px;
+}
 
-    .card-body {
-      padding: 10px;
-    }
+.title {
+  font-size: 14px;
+  font-weight: bold;
+}
 
-    .title {
-      font-size: 14px;
-      font-weight: bold;
-    }
+.info {
+  font-size: 12px;
+  color: #ccc;
+}
 
-    .info {
-      font-size: 12px;
-      color: #ccc;
-      margin-top: 3px;
-    }
+/* ===== DETAIL ===== */
+.detail, .reader {
+  display: none;
+  padding: 15px;
+}
 
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 15px;
-    }
+.detail-header {
+  display: flex;
+  gap: 15px;
+}
 
-    button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.detail-header img {
+  width: 160px;
+  border-radius: 8px;
+}
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+.genres span {
+  background: #333;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin-right: 5px;
+}
 
-    /* ===== DETAIL ===== */
-    .detail {
-      padding: 15px;
-      display: none;
-    }
+.chapter {
+  background: #1c1c1c;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    .detail-header {
-      display: flex;
-      gap: 15px;
-    }
+/* ===== READER ===== */
+.reader img {
+  width: 100%;
+  margin-bottom: 10px;
+}
 
-    .detail-header img {
-      width: 160px;
-      border-radius: 8px;
-    }
+.nav-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
 
-    .detail-info h2 {
-      margin: 0 0 5px;
-    }
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    .genres span {
-      background: #333;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-size: 12px;
-      margin-right: 5px;
-    }
+button:disabled {
+  opacity: 0.5;
+}
 
-    .synopsis {
-      margin-top: 15px;
-      line-height: 1.5;
-      color: #ddd;
-    }
-
-    .chapter-list {
-      margin-top: 20px;
-    }
-
-    .chapter {
-      padding: 10px;
-      background: #1c1c1c;
-      margin-bottom: 8px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .chapter:hover {
-      background: #2a2a2a;
-    }
-
-    .back-btn {
-      margin-bottom: 15px;
-      background: #444;
-      color: white;
-    }
-  </style>
+.back-btn {
+  margin-bottom: 15px;
+  background: #444;
+  color: white;
+}
+</style>
 </head>
+
 <body>
 
 <header>📚 Komik Reader</header>
 
-<!-- LIST MANGA -->
+<!-- LIST -->
 <div id="listView">
   <div class="container" id="mangaList"></div>
-
-  <div class="pagination">
-    <button id="prevBtn">⬅ Prev</button>
-    <span id="pageInfo"></span>
-    <button id="nextBtn">Next ➡</button>
-  </div>
 </div>
 
-<!-- DETAIL MANGA -->
+<!-- DETAIL -->
 <div class="detail" id="detailView">
   <button class="back-btn" onclick="showList()">⬅ Kembali</button>
-
   <div class="detail-header">
     <img id="detailThumb">
-    <div class="detail-info">
+    <div>
       <h2 id="detailTitle"></h2>
       <div id="detailMeta"></div>
       <div class="genres" id="detailGenres"></div>
     </div>
   </div>
+  <p id="detailSynopsis"></p>
+  <h3>📖 Daftar Chapter</h3>
+  <div id="chapterList"></div>
+</div>
 
-  <div class="synopsis" id="detailSynopsis"></div>
+<!-- READER -->
+<div class="reader" id="readerView">
+  <button class="back-btn" onclick="backToDetail()">⬅ Kembali ke Detail</button>
 
-  <div class="chapter-list" id="chapterList">
-    <h3>📖 Daftar Chapter</h3>
+  <h2 id="chapterTitle"></h2>
+
+  <div class="nav-btns">
+    <button id="prevChapter">⬅ Sebelumnya</button>
+    <button id="nextChapter">Lanjut ➡</button>
   </div>
+
+  <div id="imageContainer"></div>
 </div>
 
 <script>
-  const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
-  let currentPage = 1;
+const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
 
-  const listView = document.getElementById("listView");
-  const detailView = document.getElementById("detailView");
+const listView = document.getElementById("listView");
+const detailView = document.getElementById("detailView");
+const readerView = document.getElementById("readerView");
 
-  const mangaList = document.getElementById("mangaList");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const pageInfo = document.getElementById("pageInfo");
+let currentMangaSlug = "";
+let currentChapterSlug = "";
 
-  async function loadManga(page = 1) {
-    mangaList.innerHTML = "Loading...";
-    const res = await fetch(`${API}/${page}`);
-    const json = await res.json();
+async function loadManga() {
+  const res = await fetch(API);
+  const json = await res.json();
+  const list = document.getElementById("mangaList");
+  list.innerHTML = "";
 
-    mangaList.innerHTML = "";
+  json.data.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${m.thumbnail}">
+      <div class="card-body">
+        <div class="title">${m.title}</div>
+        <div class="info">${m.latest_chapter?.title || ""}</div>
+      </div>
+    `;
+    card.onclick = () => loadDetail(m.slug);
+    list.appendChild(card);
+  });
+}
 
-    json.data.forEach(manga => {
-      const card = document.createElement("div");
-      card.className = "card";
+async function loadDetail(slug) {
+  currentMangaSlug = slug;
+  listView.style.display = "none";
+  detailView.style.display = "block";
 
-      card.innerHTML = `
-        <img src="${manga.thumbnail}">
-        <div class="card-body">
-          <div class="title">${manga.title}</div>
-          <div class="info">⭐ ${manga.rating || "-"}</div>
-          <div class="info">${manga.latest_chapter?.title || "-"}</div>
-        </div>
-      `;
+  const res = await fetch(`${API}/detail/${slug}`);
+  const json = await res.json();
+  const d = json.data;
 
-      card.onclick = () => loadDetail(manga.slug);
-      mangaList.appendChild(card);
-    });
+  document.getElementById("detailThumb").src = d.thumbnail;
+  document.getElementById("detailTitle").textContent = d.title;
+  document.getElementById("detailMeta").textContent =
+    `⭐ ${d.rating} | ${d.type} | ${d.status}`;
+  document.getElementById("detailSynopsis").textContent = d.synopsis;
 
-    currentPage = json.meta.page;
-    pageInfo.textContent = `Halaman ${currentPage}`;
-    prevBtn.disabled = !json.meta.prev_page;
-    nextBtn.disabled = !json.meta.next_page;
-  }
+  const g = document.getElementById("detailGenres");
+  g.innerHTML = "";
+  d.genres.forEach(x => g.innerHTML += `<span>${x}</span>`);
 
-  async function loadDetail(slug) {
-    listView.style.display = "none";
-    detailView.style.display = "block";
+  const c = document.getElementById("chapterList");
+  c.innerHTML = "";
+  d.chapters.forEach(ch => {
+    const div = document.createElement("div");
+    div.className = "chapter";
+    div.textContent = ch.title;
+    div.onclick = () => loadChapter(ch.slug);
+    c.appendChild(div);
+  });
+}
 
-    const res = await fetch(`${API}/detail/${slug}`);
-    const json = await res.json();
-    const d = json.data;
+async function loadChapter(slug) {
+  currentChapterSlug = slug;
+  detailView.style.display = "none";
+  readerView.style.display = "block";
 
-    document.getElementById("detailThumb").src = d.thumbnail;
-    document.getElementById("detailTitle").textContent = d.title;
-    document.getElementById("detailMeta").innerHTML =
-      `⭐ ${d.rating} | ${d.type} | ${d.status}`;
+  const res = await fetch(`${API}/chapter/${slug}`);
+  const json = await res.json();
+  const d = json.data;
 
-    document.getElementById("detailSynopsis").textContent = d.synopsis;
+  document.getElementById("chapterTitle").textContent = d.title;
 
-    const genresEl = document.getElementById("detailGenres");
-    genresEl.innerHTML = "";
-    d.genres.forEach(g => {
-      genresEl.innerHTML += `<span>${g}</span>`;
-    });
+  const imgBox = document.getElementById("imageContainer");
+  imgBox.innerHTML = "";
 
-    const chapterList = document.getElementById("chapterList");
-    chapterList.innerHTML = "<h3>📖 Daftar Chapter</h3>";
+  d.images.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.loading = "lazy"; // 🔥 LAZY LOAD
+    imgBox.appendChild(img);
+  });
 
-    d.chapters.forEach(ch => {
-      const div = document.createElement("div");
-      div.className = "chapter";
-      div.textContent = ch.title;
-      div.onclick = () => alert("Slug chapter: " + ch.slug);
-      chapterList.appendChild(div);
-    });
-  }
+  document.getElementById("prevChapter").disabled = !d.previous_chapter_slug;
+  document.getElementById("nextChapter").disabled = !d.next_chapter_slug;
 
-  function showList() {
-    detailView.style.display = "none";
-    listView.style.display = "block";
-  }
+  document.getElementById("prevChapter").onclick =
+    () => loadChapter(d.previous_chapter_slug);
 
-  prevBtn.onclick = () => loadManga(currentPage - 1);
-  nextBtn.onclick = () => loadManga(currentPage + 1);
+  document.getElementById("nextChapter").onclick =
+    () => loadChapter(d.next_chapter_slug);
+}
 
-  loadManga();
+function showList() {
+  detailView.style.display = "none";
+  readerView.style.display = "none";
+  listView.style.display = "block";
+}
+
+function backToDetail() {
+  readerView.style.display = "none";
+  detailView.style.display = "block";
+}
+
+loadManga();
 </script>
 
 </body>
