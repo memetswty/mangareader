@@ -21,10 +21,38 @@ header {
   font-weight: bold;
 }
 
-/* === NAV === */
+/* === SEARCH BAR === */
+.search-box {
+  display: flex;
+  padding: 10px 15px;
+  background: #181818;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.search-box button {
+  margin-left: 10px;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* === NAV TAB === */
 .nav {
   display: flex;
-  justify-content: center;
   background: #181818;
 }
 
@@ -127,10 +155,16 @@ button:disabled {
 
 <header>📚 Komik Reader</header>
 
-<!-- NAVIGATION -->
+<!-- SEARCH -->
+<div class="search-box">
+  <input id="searchInput" placeholder="Cari judul komik...">
+  <button onclick="searchManga()">🔍</button>
+</div>
+
+<!-- NAV -->
 <div class="nav">
-  <button id="tabAll" class="active">📚 Semua Komik</button>
-  <button id="tabLatest">🆕 Komik Terbaru</button>
+  <button id="tabAll" class="active">📚 Semua</button>
+  <button id="tabLatest">🆕 Terbaru</button>
 </div>
 
 <!-- LIST -->
@@ -161,8 +195,8 @@ button:disabled {
 
 <script>
 const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
-
 const mangaList = document.getElementById("mangaList");
+
 const listView = document.getElementById("listView");
 const detailView = document.getElementById("detailView");
 const readerView = document.getElementById("readerView");
@@ -170,27 +204,48 @@ const readerView = document.getElementById("readerView");
 const tabAll = document.getElementById("tabAll");
 const tabLatest = document.getElementById("tabLatest");
 
-let currentChapter = "";
+let mode = "all";
 
-/* ===== LIST ALL ===== */
+/* ===== ALL ===== */
 async function loadAllManga() {
+  mode = "all";
   setActiveTab(tabAll);
   const res = await fetch(API);
   const json = await res.json();
   renderList(json.data);
 }
 
-/* ===== LIST LATEST ===== */
+/* ===== LATEST ===== */
 async function loadLatestManga() {
+  mode = "latest";
   setActiveTab(tabLatest);
   const res = await fetch(`${API}/latest`);
   const json = await res.json();
   renderList(json.data);
 }
 
-/* ===== RENDER LIST ===== */
+/* ===== SEARCH ===== */
+async function searchManga() {
+  const q = document.getElementById("searchInput").value.trim();
+  if (!q) return;
+
+  mode = "search";
+  tabAll.classList.remove("active");
+  tabLatest.classList.remove("active");
+
+  const res = await fetch(`${API}/search?q=${encodeURIComponent(q)}`);
+  const json = await res.json();
+  renderList(json.data);
+}
+
+/* ===== RENDER ===== */
 function renderList(data) {
   mangaList.innerHTML = "";
+  if (data.length === 0) {
+    mangaList.innerHTML = "<p>❌ Komik tidak ditemukan</p>";
+    return;
+  }
+
   data.forEach(m => {
     const div = document.createElement("div");
     div.className = "card";
@@ -232,7 +287,6 @@ async function loadDetail(slug) {
 
 /* ===== CHAPTER ===== */
 async function loadChapter(slug) {
-  currentChapter = slug;
   detailView.style.display = "none";
   readerView.style.display = "block";
 
@@ -280,6 +334,10 @@ function backToDetail() {
 
 tabAll.onclick = loadAllManga;
 tabLatest.onclick = loadLatestManga;
+
+document.getElementById("searchInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") searchManga();
+});
 
 loadAllManga();
 </script>
