@@ -2,451 +2,221 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Komik Reader</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Komik Reader</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: #fff;
+*{box-sizing:border-box;font-family:system-ui}
+body{margin:0;background:#111;color:#fff}
+button{cursor:pointer}
+
+/* SEARCH */
+.search-wrap{padding:12px;background:#181818}
+.search-box{position:relative}
+.search-box input{
+  width:100%;padding:12px 42px 12px 14px;
+  border-radius:25px;border:none;
+  background:#2a2a2a;color:#fff
+}
+.search-action{
+  position:absolute;right:6px;top:50%;
+  transform:translateY(-50%) scale(.8);
+  display:flex;gap:6px;
+  opacity:0;pointer-events:none;transition:.25s
+}
+.search-action.show{opacity:1;transform:translateY(-50%) scale(1);pointer-events:auto}
+.search-action button{width:32px;height:32px;border-radius:50%;border:none}
+
+/* NAV */
+.nav{display:flex;position:relative;background:#181818}
+.nav button{flex:1;padding:14px;background:none;border:none;color:#aaa;font-weight:bold}
+.nav button.active{color:#fff}
+.nav-indicator{position:absolute;bottom:0;height:3px;width:50%;background:#fff;transition:.35s}
+
+/* CONTENT */
+#content{padding:10px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:10px
+}
+.card{
+  background:#1c1c1c;border-radius:8px;overflow:hidden;
+  transition:.2s
+}
+.card:hover{transform:scale(1.03)}
+.card img{width:100%;aspect-ratio:3/4;object-fit:cover}
+.card .info{padding:6px;font-size:13px}
+
+/* DETAIL */
+.detail img{width:150px;border-radius:8px}
+.chapters button{
+  width:100%;margin:4px 0;padding:10px;
+  border:none;background:#222;color:#fff;border-radius:6px
 }
 
-header {
-  background: #1f1f1f;
-  padding: 15px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-}
+/* READER */
+.reader img{width:100%;display:block;margin-bottom:6px}
+.reader-nav{display:flex;gap:10px;margin:10px 0}
+.reader-nav button{flex:1;padding:12px;border:none;border-radius:6px;background:#222;color:#fff}
 
-/* ===== SEARCH ===== */
-.search-wrap {
-  background: #181818;
-  padding: 10px;
+/* BOOKMARK */
+.bookmark-btn{
+  margin:8px 0;padding:10px;
+  background:#ffcc00;color:#000;border:none;border-radius:6px;font-weight:bold
 }
-
-.search-box {
-  display: flex;
-  gap: 8px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 12px 14px;
-  border-radius: 25px;
-  border: none;
-  outline: none;
-  background: #2a2a2a;
-  color: #fff;
-}
-
-.search-box button {
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  border: none;
-  cursor: pointer;
-}
-
-.clear-btn {
-  background: #444;
-  color: #fff;
-}
-
-/* autosuggest */
-.suggest {
-  background: #222;
-  border-radius: 8px;
-  margin-top: 6px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.suggest div {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.suggest div:hover {
-  background: #333;
-}
-
-/* ===== FILTER ===== */
-.filter {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.filter select {
-  flex: 1;
-  padding: 8px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-}
-
-/* ===== NAV ===== */
-.nav {
-  display: flex;
-  background: #181818;
-}
-
-.nav button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  background: none;
-  color: #aaa;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.nav button.active {
-  color: #fff;
-  background: #222;
-  border-bottom: 2px solid #fff;
-}
-
-/* ===== LIST ===== */
-.container {
-  padding: 15px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-}
-
-.card {
-  background: #1c1c1c;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-}
-
-.card-body {
-  padding: 10px;
-}
-
-.title {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-mark {
-  background: #ffd54f;
-  color: #000;
-}
-
-/* ===== PAGINATION ===== */
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 15px;
-}
-
-/* ===== DETAIL & READER ===== */
-.detail, .reader {
-  display: none;
-  padding: 15px;
-}
-
-.chapter {
-  background: #1c1c1c;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.reader img {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.nav-btns {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-button {
-  padding: 8px 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button:disabled {
-  opacity: 0.5;
-}
-
-.back-btn {
-  background: #444;
-  color: #fff;
-  margin-bottom: 10px;
-}
+.section-title{margin-top:20px}
 </style>
 </head>
 
 <body>
 
-<header>📚 Komik Reader</header>
-
-<!-- SEARCH -->
 <div class="search-wrap">
   <div class="search-box">
     <input id="searchInput" placeholder="Cari judul komik...">
-    <button onclick="searchManga()">🔍</button>
-    <button class="clear-btn" onclick="clearSearch()">❌</button>
-  </div>
-
-  <div id="suggestBox" class="suggest" style="display:none"></div>
-
-  <div class="filter">
-    <select id="typeFilter" onchange="applyFilter()">
-      <option value="">Semua Type</option>
-      <option value="Manga">Manga</option>
-      <option value="Manhwa">Manhwa</option>
-      <option value="Manhua">Manhua</option>
-    </select>
+    <div id="searchAction" class="search-action">
+      <button onclick="searchManga()">🔍</button>
+      <button onclick="clearSearch()">❌</button>
+    </div>
   </div>
 </div>
 
-<!-- NAV -->
 <div class="nav">
   <button id="tabAll" class="active">📚 Semua</button>
   <button id="tabLatest">🆕 Terbaru</button>
+  <div id="navIndicator" class="nav-indicator"></div>
 </div>
 
-<!-- LIST -->
-<div id="listView">
-  <div class="container" id="mangaList"></div>
-
-  <div class="pagination">
-    <button id="prevPage">⬅ Prev</button>
-    <button id="nextPage">Next ➡</button>
-  </div>
-</div>
-
-<!-- DETAIL -->
-<div class="detail" id="detailView">
-  <button class="back-btn" onclick="backToList()">⬅ Kembali</button>
-  <h2 id="detailTitle"></h2>
-  <img id="detailThumb" style="width:150px;border-radius:8px">
-  <p id="detailSynopsis"></p>
-  <h3>📖 Chapter</h3>
-  <div id="chapterList"></div>
-</div>
-
-<!-- READER -->
-<div class="reader" id="readerView">
-  <button class="back-btn" onclick="backToDetail()">⬅ Kembali</button>
-  <h2 id="chapterTitle"></h2>
-  <div class="nav-btns">
-    <button id="prevChapter">⬅ Sebelumnya</button>
-    <button id="nextChapter">Lanjut ➡</button>
-  </div>
-  <div id="imageContainer"></div>
-</div>
+<div id="content"></div>
 
 <script>
-const API = "https://unofficial-komikcast-api.vercel.app/komikcast";
-const mangaList = document.getElementById("mangaList");
-const suggestBox = document.getElementById("suggestBox");
+const API="https://unofficial-komikcast-api.vercel.app";
+const content=document.getElementById("content");
+const searchInput=document.getElementById("searchInput");
+const searchAction=document.getElementById("searchAction");
+const navIndicator=document.getElementById("navIndicator");
+const tabAll=document.getElementById("tabAll");
+const tabLatest=document.getElementById("tabLatest");
 
-let mode = "all";
-let searchQuery = "";
-let searchPage = 1;
-let allDataCache = [];
+let page=1, mode="all", loading=false, lastData=[];
 
-/* ===== UTIL ===== */
-function highlight(text) {
-  if (!searchQuery) return text;
-  return text.replace(
-    new RegExp(`(${searchQuery})`, "gi"),
-    "<mark>$1</mark>"
-  );
+/* SEARCH UX */
+searchInput.oninput=e=>{
+  searchAction.classList.toggle("show",e.target.value.trim());
+};
+
+/* TAB */
+function setTab(tab){
+  tabAll.classList.remove("active");
+  tabLatest.classList.remove("active");
+  tab.classList.add("active");
+  navIndicator.style.transform=tab===tabAll?"translateX(0%)":"translateX(100%)";
+  page=1;lastData=[];content.innerHTML="";
 }
+tabAll.onclick=()=>{setTab(tabAll);mode="all";loadMore();}
+tabLatest.onclick=()=>{setTab(tabLatest);mode="latest";loadMore();}
 
-/* ===== LOAD ALL ===== */
-async function loadAllManga() {
-  mode = "all";
-  const res = await fetch(API);
-  const json = await res.json();
-  allDataCache = json.data;
-  renderList(allDataCache);
-}
-
-/* ===== LOAD LATEST ===== */
-async function loadLatestManga() {
-  mode = "latest";
-  const res = await fetch(`${API}/latest`);
-  const json = await res.json();
-  allDataCache = json.data;
-  renderList(allDataCache);
-}
-
-/* ===== SEARCH ===== */
-async function searchManga(page = 1) {
-  searchQuery = document.getElementById("searchInput").value.trim();
-  if (!searchQuery) return;
-
-  mode = "search";
-  searchPage = page;
-
-  const res = await fetch(`${API}/search?q=${encodeURIComponent(searchQuery)}&page=${page}`);
-  const json = await res.json();
-
-  allDataCache = json.data;
-  renderList(allDataCache);
-
-  document.getElementById("prevPage").disabled = !json.meta.pagination.previous_page;
-  document.getElementById("nextPage").disabled = !json.meta.pagination.next_page;
-}
-
-/* ===== AUTOSUGGEST ===== */
-let debounce;
-document.getElementById("searchInput").addEventListener("input", e => {
-  clearTimeout(debounce);
-  debounce = setTimeout(() => {
-    const val = e.target.value.trim();
-    if (!val) {
-      suggestBox.style.display = "none";
-      return;
-    }
-    const result = allDataCache
-      .filter(m => m.title.toLowerCase().includes(val.toLowerCase()))
-      .slice(0, 5);
-
-    suggestBox.innerHTML = "";
-    result.forEach(r => {
-      const d = document.createElement("div");
-      d.textContent = r.title;
-      d.onclick = () => {
-        document.getElementById("searchInput").value = r.title;
-        suggestBox.style.display = "none";
-        searchManga();
-      };
-      suggestBox.appendChild(d);
-    });
-    suggestBox.style.display = result.length ? "block" : "none";
-  }, 300);
-});
-
-/* ===== FILTER ===== */
-function applyFilter() {
-  const type = document.getElementById("typeFilter").value;
-  let filtered = allDataCache;
-  if (type) filtered = filtered.filter(m => m.type === type);
-  renderList(filtered);
-}
-
-/* ===== RENDER ===== */
-function renderList(data) {
-  mangaList.innerHTML = "";
-  if (data.length === 0) {
-    mangaList.innerHTML = "<p>❌ Tidak ditemukan</p>";
-    return;
+/* INFINITE SCROLL */
+window.onscroll=()=>{
+  if(window.innerHeight+window.scrollY>=document.body.offsetHeight-300){
+    loadMore();
   }
+};
 
-  data.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <img src="${m.thumbnail}">
-      <div class="card-body">
-        <div class="title">${highlight(m.title)}</div>
+async function loadMore(){
+  if(loading) return;
+  loading=true;
+  let url="";
+  if(mode==="all") url=`/komikcast/${page}`;
+  if(mode==="latest") url="/komikcast/latest";
+  if(mode==="search") url=`/komikcast/search?q=${searchInput.value}&page=${page}`;
+  const res=await fetch(API+url);
+  const j=await res.json();
+  const data=j.data||[];
+  lastData=[...lastData,...data];
+  renderGrid(lastData);
+  page++;loading=false;
+}
+
+/* GRID */
+function renderGrid(data){
+  content.innerHTML=`<div class="grid">${
+    data.map(m=>`
+      <div class="card" onclick="loadDetail('${m.slug}')">
+        <img loading="lazy" src="${m.thumbnail}">
+        <div class="info">${m.title}</div>
+      </div>`).join("")
+  }</div>`;
+}
+
+/* DETAIL */
+async function loadDetail(slug){
+  const res=await fetch(API+"/komikcast/detail/"+slug);
+  const d=(await res.json()).data;
+  const bookmarked=isBookmarked(slug);
+  content.innerHTML=`
+    <div class="detail">
+      <img src="${d.thumbnail}">
+      <h2>${d.title}</h2>
+      <button class="bookmark-btn" onclick="toggleBookmark('${slug}','${d.title}','${d.thumbnail}')">
+        ${bookmarked?"★ Bookmarked":"☆ Bookmark"}
+      </button>
+      <p>${d.synopsis}</p>
+      <div class="chapters">
+        ${d.chapters.map(c=>`
+          <button onclick="loadChapter('${c.slug}','${d.title}')">${c.title}</button>`).join("")}
       </div>
-    `;
-    div.onclick = () => loadDetail(m.slug);
-    mangaList.appendChild(div);
-  });
+    </div>`;
 }
 
-/* ===== CLEAR ===== */
-function clearSearch() {
-  document.getElementById("searchInput").value = "";
-  suggestBox.style.display = "none";
-  loadAllManga();
+/* READER + HISTORY */
+async function loadChapter(slug,title){
+  const res=await fetch(API+"/komikcast/chapter/"+slug);
+  const d=(await res.json()).data;
+  saveHistory(title,slug);
+  content.innerHTML=`
+    <h3>${d.title}</h3>
+    <div class="reader">
+      ${d.images.map(i=>`<img loading="lazy" src="${i}">`).join("")}
+    </div>
+    <div class="reader-nav">
+      <button ${!d.previous_chapter_slug?"disabled":""}
+        onclick="loadChapter('${d.previous_chapter_slug}','${title}')">⬅ Sebelumnya</button>
+      <button ${!d.next_chapter_slug?"disabled":""}
+        onclick="loadChapter('${d.next_chapter_slug}','${title}')">Selanjutnya ➡</button>
+    </div>`;
 }
 
-/* ===== DETAIL ===== */
-async function loadDetail(slug) {
-  document.getElementById("listView").style.display = "none";
-  document.getElementById("detailView").style.display = "block";
-
-  const res = await fetch(`${API}/detail/${slug}`);
-  const json = await res.json();
-  const d = json.data;
-
-  detailTitle.textContent = d.title;
-  detailThumb.src = d.thumbnail;
-  detailSynopsis.textContent = d.synopsis;
-
-  chapterList.innerHTML = "";
-  d.chapters.forEach(c => {
-    const div = document.createElement("div");
-    div.className = "chapter";
-    div.textContent = c.title;
-    div.onclick = () => loadChapter(c.slug);
-    chapterList.appendChild(div);
-  });
+/* SEARCH */
+function searchManga(){
+  if(!searchInput.value.trim())return;
+  mode="search";page=1;lastData=[];content.innerHTML="";
+  loadMore();
+}
+function clearSearch(){
+  searchInput.value="";searchAction.classList.remove("show");
+  setTab(tabAll);mode="all";loadMore();
 }
 
-/* ===== CHAPTER ===== */
-async function loadChapter(slug) {
-  detailView.style.display = "none";
-  readerView.style.display = "block";
-
-  const res = await fetch(`${API}/chapter/${slug}`);
-  const json = await res.json();
-  const d = json.data;
-
-  chapterTitle.textContent = d.title;
-  imageContainer.innerHTML = "";
-
-  d.images.forEach(i => {
-    const img = document.createElement("img");
-    img.src = i;
-    img.loading = "lazy";
-    imageContainer.appendChild(img);
-  });
-
-  prevChapter.disabled = !d.previous_chapter_slug;
-  nextChapter.disabled = !d.next_chapter_slug;
-
-  prevChapter.onclick = () => loadChapter(d.previous_chapter_slug);
-  nextChapter.onclick = () => loadChapter(d.next_chapter_slug);
+/* BOOKMARK */
+function getBookmarks(){return JSON.parse(localStorage.getItem("bm")||"[]")}
+function isBookmarked(slug){return getBookmarks().some(b=>b.slug===slug)}
+function toggleBookmark(slug,title,thumb){
+  let bm=getBookmarks();
+  bm=isBookmarked(slug)?bm.filter(b=>b.slug!==slug):[...bm,{slug,title,thumb}];
+  localStorage.setItem("bm",JSON.stringify(bm));
+  loadDetail(slug);
 }
 
-/* ===== NAV ===== */
-function backToList() {
-  detailView.style.display = "none";
-  readerView.style.display = "none";
-  listView.style.display = "block";
+/* HISTORY */
+function saveHistory(title,slug){
+  let h=JSON.parse(localStorage.getItem("history")||"[]");
+  h=[{title,slug,date:Date.now()},...h.filter(x=>x.slug!==slug)].slice(0,20);
+  localStorage.setItem("history",JSON.stringify(h));
 }
 
-function backToDetail() {
-  readerView.style.display = "none";
-  detailView.style.display = "block";
-}
-
-document.getElementById("prevPage").onclick = () => searchManga(searchPage - 1);
-document.getElementById("nextPage").onclick = () => searchManga(searchPage + 1);
-
-tabAll.onclick = loadAllManga;
-tabLatest.onclick = loadLatestManga;
-
-loadAllManga();
+/* INIT */
+loadMore();
 </script>
 
 </body>
